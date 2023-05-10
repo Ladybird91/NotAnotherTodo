@@ -5,14 +5,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.AccountBox
 import androidx.compose.material.icons.outlined.CheckBox
 import androidx.compose.material.icons.outlined.Login
 import androidx.compose.material.icons.outlined.Redeem
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
@@ -34,6 +37,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.coroutines.launch
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 
 fun navigationBarMenu(): List<Pair<ImageVector, String>> {
     return listOf(
@@ -55,7 +60,10 @@ fun CustomNavigation() {
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val drawerItems = navigationDrawerMenu()
-    var selectedItem by remember { mutableStateOf(-1) }
+    var selectedPage by remember { mutableStateOf(-1) }
+    val sheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
+
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -69,9 +77,9 @@ fun CustomNavigation() {
                         label = {
                             Text(text = data.second)
                         },
-                        selected = selectedItem == index,
+                        selected = selectedPage == index,
                         onClick = {
-                            selectedItem = index
+                            selectedPage = index
                         })
                 }
             }
@@ -90,6 +98,15 @@ fun CustomNavigation() {
                         drawerState.open()
                     }
                 }
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = {
+                        showBottomSheet = true
+                    }
+                ) {
+                    Icon(Icons.Filled.Add, contentDescription = "FAB Add Icon")
+                }
             }
         ) {
             Box(
@@ -100,6 +117,25 @@ fun CustomNavigation() {
             ) {
                 Text(text = "$currentPage Page")
             }
+            if (showBottomSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = {
+                        showBottomSheet = false
+                    },
+                    sheetState = sheetState
+                ) {
+                    // Sheet content
+                    Button(onClick = {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                showBottomSheet = false
+                            }
+                        }
+                    }) {
+                        Text("Hide bottom sheet")
+                    }
+                }
+            }
         }
     }
 }
@@ -107,15 +143,15 @@ fun CustomNavigation() {
 @Composable
 fun CustomNavigationBar(callback: (String) -> Unit) {
 
-    var selectedIndex by remember { mutableStateOf(0) }
+    var selectedPage by remember { mutableStateOf(0) }
     val barItems = navigationBarMenu()
 
     NavigationBar {
         barItems.forEachIndexed { index, data ->
             NavigationBarItem(
-                selected = selectedIndex == index,
+                selected = selectedPage == index,
                 onClick = {
-                    selectedIndex = index
+                    selectedPage = index
                     callback(data.second)
                 },
                 label = {
