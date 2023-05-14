@@ -2,10 +2,9 @@ package com.hw.notanothertodo
 
 import android.util.Log
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.AccountBox
 import androidx.compose.material.icons.outlined.CheckBox
@@ -15,9 +14,9 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
@@ -39,6 +38,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.coroutines.launch
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+
 
 fun navigationBarMenu(): List<Pair<ImageVector, String>> {
     return listOf(
@@ -49,14 +51,19 @@ fun navigationBarMenu(): List<Pair<ImageVector, String>> {
 }
 
 fun navigationDrawerMenu(): List<Pair<ImageVector, String>> {
-    return listOf(Icons.Outlined.Login to "Login", Icons.Outlined.Settings to "Settings")
+    return listOf(
+        Icons.Outlined.Login to "Login",
+        Icons.Outlined.Settings to "Settings")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomNavigation() {
 
-    var currentPage by remember { mutableStateOf(navigationBarMenu().firstOrNull()?.second) }
+    val pagesWithFab = listOf("Tasks", "Prizes")
+    val pagesForTasks = listOf("Tasks")
+    var currentPage by remember { mutableStateOf(navigationBarMenu().firstOrNull()?.second ?: "") }
+
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val drawerItems = navigationDrawerMenu()
@@ -86,11 +93,6 @@ fun CustomNavigation() {
         }
     ) {
         Scaffold(
-            bottomBar = {
-                CustomNavigationBar {
-                    currentPage = it
-                }
-            },
             topBar = {
                 CustomTopBar {
                     Log.d("TAG", "Navigation drawer open on click")
@@ -99,46 +101,60 @@ fun CustomNavigation() {
                     }
                 }
             },
+            bottomBar = {
+                CustomNavigationBar {
+                    currentPage = it
+                }
+            },
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = {
+                if (pagesWithFab.contains(currentPage)) {
+                    CustomFloatingActionButton {
                         showBottomSheet = true
                     }
-                ) {
-                    Icon(Icons.Filled.Add, contentDescription = "FAB Add Icon")
                 }
+
             }
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(it),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = "$currentPage Page")
+            if (pagesForTasks.contains(currentPage)) {
+                TaskPageLayout(contentPadding = it)
+                }
             }
-            if (showBottomSheet) {
-                ModalBottomSheet(
-                    onDismissRequest = {
-                        showBottomSheet = false
-                    },
-                    sheetState = sheetState
-                ) {
-                    // Sheet content
-                    Button(onClick = {
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
-                            if (!sheetState.isVisible) {
-                                showBottomSheet = false
-                            }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Text(
+                text = currentPage,
+                style = MaterialTheme.typography.headlineMedium,
+                textAlign = TextAlign.Center
+            )
+        }
+        }
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showBottomSheet = false
+                },
+                sheetState = sheetState
+            ) {
+                // Sheet content
+                Button(onClick = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            showBottomSheet = false
                         }
-                    }) {
-                        Text("Hide bottom sheet")
                     }
+                }) {
+                    Text("Hide bottom sheet")
                 }
             }
         }
     }
-}
+
+
 
 @Composable
 fun CustomNavigationBar(callback: (String) -> Unit) {
@@ -176,3 +192,7 @@ fun CustomTopBar(callback: () -> Unit) {
         }
     )
 }
+
+
+
+
