@@ -1,7 +1,11 @@
 package com.hw.notanothertodo
 
 import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -38,6 +42,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.coroutines.launch
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
@@ -52,8 +58,8 @@ fun navigationBarMenu(): List<Pair<ImageVector, String>> {
 
 fun navigationDrawerMenu(): List<Pair<ImageVector, String>> {
     return listOf(
-        Icons.Outlined.Login to "Login",
-        Icons.Outlined.Settings to "Settings")
+        Icons.Outlined.Login to "Login", Icons.Outlined.Settings to "Settings"
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,55 +76,63 @@ fun CustomNavigation() {
     var selectedPage by remember { mutableStateOf(-1) }
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
+    ModalNavigationDrawer(drawerState = drawerState, drawerContent = {
+        Box(
+            Modifier.fillMaxSize()
+            //     .verticalScroll(rememberScrollState()) // Add verticalScroll modifier to Box
+        ) {
+            Column {
 
-
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
-                drawerItems.forEachIndexed { index, data ->
-                    NavigationDrawerItem(
-                        icon = {
+                ModalDrawerSheet(Modifier.weight(1f)) {
+                    drawerItems.forEachIndexed { index, data ->
+                        NavigationDrawerItem(icon = {
                             Icon(imageVector = data.first, contentDescription = data.second)
-                        },
-                        label = {
+                        }, label = {
                             Text(text = data.second)
-                        },
-                        selected = selectedPage == index,
-                        onClick = {
+                        }, selected = selectedPage == index, onClick = {
                             selectedPage = index
                         })
+                    }
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Bottom,
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.passionflower_choice_two),
+                            contentDescription = "Image in drawer",
+                            contentScale = ContentScale.FillWidth,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp)
+                            //.align(Alignment.End)
+                        )
+                    }
                 }
             }
         }
-    ) {
-        Scaffold(
-            topBar = {
-                CustomTopBar {
-                    Log.d("TAG", "Navigation drawer open on click")
-                    scope.launch {
-                        drawerState.open()
-                    }
+    }) {
+        Scaffold(topBar = {
+            CustomTopBar {
+                Log.d("TAG", "Navigation drawer open on click")
+                scope.launch {
+                    drawerState.open()
                 }
-            },
-            bottomBar = {
-                CustomNavigationBar {
-                    currentPage = it
-                }
-            },
-            floatingActionButton = {
-                if (pagesWithFab.contains(currentPage)) {
-                    CustomFloatingActionButton {
-                        showBottomSheet = true
-                    }
-                }
-
             }
-        ) {
+        }, bottomBar = {
+            CustomNavigationBar {
+                currentPage = it
+            }
+        }, floatingActionButton = {
+            if (pagesWithFab.contains(currentPage)) {
+                CustomFloatingActionButton {
+                    showBottomSheet = true
+                }
+            }
+        }) {
             if (pagesForTasks.contains(currentPage)) {
                 TaskPageLayout(contentPadding = it)
-                }
             }
+        }
 
         Box(
             modifier = Modifier
@@ -132,28 +146,26 @@ fun CustomNavigation() {
                 textAlign = TextAlign.Center
             )
         }
-        }
-        if (showBottomSheet) {
-            ModalBottomSheet(
-                onDismissRequest = {
-                    showBottomSheet = false
-                },
-                sheetState = sheetState
-            ) {
-                // Sheet content
-                Button(onClick = {
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            showBottomSheet = false
-                        }
+    }
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showBottomSheet = false
+            }, sheetState = sheetState
+        ) {
+            // Sheet content
+            Button(onClick = {
+                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                    if (!sheetState.isVisible) {
+                        showBottomSheet = false
                     }
-                }) {
-                    Text("Hide bottom sheet")
                 }
+            }) {
+                Text("Hide bottom sheet")
             }
         }
     }
-
+}
 
 
 @Composable
@@ -164,18 +176,14 @@ fun CustomNavigationBar(callback: (String) -> Unit) {
 
     NavigationBar {
         barItems.forEachIndexed { index, data ->
-            NavigationBarItem(
-                selected = selectedPage == index,
-                onClick = {
-                    selectedPage = index
-                    callback(data.second)
-                },
-                label = {
-                    Text(text = data.second)
-                },
-                icon = {
-                    Icon(imageVector = data.first, contentDescription = "Navigation bar icons")
-                })
+            NavigationBarItem(selected = selectedPage == index, onClick = {
+                selectedPage = index
+                callback(data.second)
+            }, label = {
+                Text(text = data.second)
+            }, icon = {
+                Icon(imageVector = data.first, contentDescription = "Navigation bar icons")
+            })
         }
     }
 }
@@ -183,14 +191,11 @@ fun CustomNavigationBar(callback: (String) -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomTopBar(callback: () -> Unit) {
-    TopAppBar(
-        title = {},
-        navigationIcon = {
-            IconButton(onClick = callback) {
-                Icon(Icons.Filled.Menu, contentDescription = "Navigation Drawer")
-            }
+    TopAppBar(title = {}, navigationIcon = {
+        IconButton(onClick = callback) {
+            Icon(Icons.Filled.Menu, contentDescription = "Navigation Drawer")
         }
-    )
+    })
 }
 
 
