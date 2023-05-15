@@ -3,25 +3,47 @@ package com.hw.notanothertodo.objects
 class User (
     var name: String,
     val email: String,
-    var currentPoints: Int,
-    var lifetimePoints: Int,
-    val incompleteTasks: Array<Task>,
-    val allTasks: Array<Task>,
-    val categories: Array<String>)
+    private var currentPoints: Int,
+    private var lifetimePoints: Int,
+    private val incompleteTasks: HashMap<String, Task>,
+    private val allTasks: HashMap<String, Task>,
+    val categories: HashMap<String, Array<Task>>) //idt this implementation will work.
 {
-    //addActiveTask
+    private fun addTask(task: Task){
+        val taskKey = task.title
+        allTasks[taskKey] = task
+        incompleteTasks[taskKey] = task
+        //to do: categories solution
 
-    //archiveTask
+    }
 
-    //deleteTask
+    private fun archiveTask(task: Task){
+        incompleteTasks.remove(task.title)
+    }
 
-    //minusCurrPoints
 
-    //minusLifetimePoints
+    private fun deleteTask(task: Task){
+        incompleteTasks.remove(task.title)
+        allTasks.remove(task.title)
+    }
 
-    //addPoints
+    private fun minusCurrPoints(points: Int){
+        currentPoints -= points
+    }
+    private fun minusPoints(points: Int){
+        currentPoints -= points
+        lifetimePoints -= points
+    }
 
-    //redeemPrize
+    private fun addPoints(points: Int){
+        currentPoints += points
+        lifetimePoints += points
+    }
+
+
+    private fun redeemPrize(prize: Prize){
+        minusCurrPoints(prize.cost)
+    }
 
 
 }
