@@ -47,7 +47,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
-
+// Returns a list of pairs representing the lower navigation bar menu items
 fun navigationBarMenu(): List<Pair<ImageVector, String>> {
     return listOf(
         Icons.Outlined.CheckBox to "Tasks",
@@ -56,18 +56,23 @@ fun navigationBarMenu(): List<Pair<ImageVector, String>> {
     )
 }
 
+// Returns a list of pairs representing the side navigation drawer menu items
 fun navigationDrawerMenu(): List<Pair<ImageVector, String>> {
     return listOf(
-        Icons.Outlined.Login to "Login", Icons.Outlined.Settings to "Settings"
+        Icons.Outlined.Login to "Login",
+        Icons.Outlined.Settings to "Settings"
     )
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomNavigation() {
 
+    // To narrow down which pages show which features
     val pagesWithFab = listOf("Tasks", "Prizes")
     val pagesForTasks = listOf("Tasks")
+    // Temporary to show selected page - need to implement real navigation later
     var currentPage by remember { mutableStateOf(navigationBarMenu().firstOrNull()?.second ?: "") }
 
     val scope = rememberCoroutineScope()
@@ -76,27 +81,35 @@ fun CustomNavigation() {
     var selectedPage by remember { mutableStateOf(-1) }
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
+
+    // Modal side navigation drawer
     ModalNavigationDrawer(drawerState = drawerState, drawerContent = {
         Box(
             Modifier.fillMaxSize()
-            //     .verticalScroll(rememberScrollState()) // Add verticalScroll modifier to Box
         ) {
             Column {
-
                 ModalDrawerSheet(Modifier.weight(1f)) {
+                    // Navigation drawer pages
                     drawerItems.forEachIndexed { index, data ->
-                        NavigationDrawerItem(icon = {
-                            Icon(imageVector = data.first, contentDescription = data.second)
-                        }, label = {
-                            Text(text = data.second)
-                        }, selected = selectedPage == index, onClick = {
-                            selectedPage = index
-                        })
+                        NavigationDrawerItem(
+                            icon = {
+                                Icon(imageVector = data.first, contentDescription = data.second)
+                            },
+                            label = {
+                                Text(text = data.second)
+                            },
+                            selected = selectedPage == index,
+                            onClick = {
+                                selectedPage = index
+                            }
+                        )
                     }
+                    // Decorative image for side drawer
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Bottom,
                     ) {
+                        // Image in drawer
                         Image(
                             painter = painterResource(R.drawable.passionflower_choice_two),
                             contentDescription = "Image in drawer",
@@ -104,14 +117,15 @@ fun CustomNavigation() {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 16.dp)
-                            //.align(Alignment.End)
                         )
                     }
                 }
             }
         }
     }) {
+        // Main base layout on screens
         Scaffold(topBar = {
+            // Custom top bar
             CustomTopBar {
                 Log.d("TAG", "Navigation drawer open on click")
                 scope.launch {
@@ -119,6 +133,7 @@ fun CustomNavigation() {
                 }
             }
         }, bottomBar = {
+            // Custom navigation bar
             CustomNavigationBar {
                 currentPage = it
             }
@@ -130,16 +145,17 @@ fun CustomNavigation() {
             }
         }) {
             if (pagesForTasks.contains(currentPage)) {
+                // Task page layout
                 TaskPageLayout(contentPadding = it)
             }
         }
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
+            // Display current page text
             Text(
                 text = currentPage,
                 style = MaterialTheme.typography.headlineMedium,
@@ -147,11 +163,13 @@ fun CustomNavigation() {
             )
         }
     }
+    // Modal bottom sheet to add tasks or prizes demending on page
     if (showBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = {
                 showBottomSheet = false
-            }, sheetState = sheetState
+            },
+            sheetState = sheetState
         ) {
             // Sheet content
             Button(onClick = {
@@ -176,17 +194,23 @@ fun CustomNavigationBar(callback: (String) -> Unit) {
 
     NavigationBar {
         barItems.forEachIndexed { index, data ->
-            NavigationBarItem(selected = selectedPage == index, onClick = {
-                selectedPage = index
-                callback(data.second)
-            }, label = {
-                Text(text = data.second)
-            }, icon = {
-                Icon(imageVector = data.first, contentDescription = "Navigation bar icons")
-            })
+            NavigationBarItem(
+                selected = selectedPage == index,
+                onClick = {
+                    selectedPage = index
+                    callback(data.second)
+                },
+                label = {
+                    Text(text = data.second)
+                },
+                icon = {
+                    Icon(imageVector = data.first, contentDescription = "Navigation bar icons")
+                }
+            )
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -197,6 +221,7 @@ fun CustomTopBar(callback: () -> Unit) {
         }
     })
 }
+
 
 
 
