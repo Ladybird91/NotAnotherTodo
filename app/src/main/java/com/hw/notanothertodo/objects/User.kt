@@ -1,48 +1,91 @@
 package com.hw.notanothertodo.objects
 
+import android.icu.text.CaseMap.Title
+
 class User (
     var name: String,
-    val email: String,
-    private var currentPoints: Int,
-    private var lifetimePoints: Int,
-    private val incompleteTasks: HashMap<String, Task>,
-    private val allTasks: HashMap<String, Task>,
-    val categories: HashMap<String, Array<Task>>) //idt this implementation will work.
+    val email: String
+    )
 {
-    private fun addTask(task: Task){
-        val taskKey = task.title
-        allTasks[taskKey] = task
-        incompleteTasks[taskKey] = task
+    val currentTasks : HashMap<Int, Task> = HashMap()
+    val archivedTasks: HashMap<Int, Task> = HashMap()
+    private var currentPoints: Int = 0
+    private var lifetimePoints: Int = 0
+    private var nextTaskID: Int = 0
+    var categories: HashMap<String, HashMap<String, Task>> = HashMap()
+
+    fun startUp(){
+        addCategory("default")
+    }
+
+    fun getLifetimePoints(): Int {
+        return lifetimePoints
+    }
+
+    fun getCurrentPoints(): Int {
+        return currentPoints
+    }
+
+    fun numCurrentTasks(): Int {
+        return currentTasks.size
+    }
+
+    fun numTotalTasks(): Int {
+        return currentTasks.size + archivedTasks.size
+    }
+
+    fun getNextTaskID(): Int {
+        return nextTaskID
+    }
+    fun addTask(task: Task){
+        currentTasks[task.id] = task
+        nextTaskID++
         //to do: categories solution
 
     }
 
-    private fun archiveTask(task: Task){
-        incompleteTasks.remove(task.title)
+    fun archiveTask(task: Task){
+        currentTasks.remove(task.id)
+        archivedTasks[task.id] = task
+        addPoints(task.pointValue)
     }
 
 
-    private fun deleteTask(task: Task){
-        incompleteTasks.remove(task.title)
-        allTasks.remove(task.title)
+    fun deleteTask(task: Task){
+        currentTasks.remove(task.id)
     }
 
     private fun minusCurrPoints(points: Int){
         currentPoints -= points
     }
-    private fun minusPoints(points: Int){
+    fun minusPoints(points: Int){
         currentPoints -= points
         lifetimePoints -= points
     }
 
-    private fun addPoints(points: Int){
+    fun addPoints(points: Int){
         currentPoints += points
         lifetimePoints += points
     }
 
 
-    private fun redeemPrize(prize: Prize){
+    fun redeemPrize(prize: Prize){
         minusCurrPoints(prize.cost)
+    }
+
+    fun addCategory(cat: String){
+        if (categories.containsKey(cat)){
+           return
+        }
+        val newMap = HashMap<String, Task>()
+        categories[cat] = newMap
+    }
+
+    private fun removeCategory(cat: String){
+        if (!categories.containsKey(cat)){
+            return
+        }
+        categories.remove(cat)
     }
 
 
