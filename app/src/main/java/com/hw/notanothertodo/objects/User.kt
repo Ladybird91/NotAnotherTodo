@@ -14,7 +14,6 @@ class User (
     private var nextTaskID: Int = 0
     var categories: HashMap<String, HashMap<String, Task>> = HashMap()
 
-
     fun startUp(){
         addCategory("default")
     }
