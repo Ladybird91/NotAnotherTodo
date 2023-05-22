@@ -40,19 +40,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.hw.notanothertodo.objects.Category
+import com.hw.notanothertodo.objects.Task
+import com.hw.notanothertodo.objects.User
 
 
-data class Category(
-    val name: String,
-)
-
-data class Task(
-    val name: String,
-    val category: Category,
-    val priority: String,
-    val difficulty: String,
-    var checked: Boolean = false
-)
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -60,20 +52,24 @@ data class Task(
 fun TaskPageLayout(
     contentPadding: PaddingValues = PaddingValues()
 ) {
-    // Temporary hard coded values for testing
-    val categories = listOf(
-        Category("Home"),
-        Category("Work"),
-        Category("Chores")
-    )
+    val testUser: User = User("jason", "jason@hotmail.com")
+    testUser.startUp()
+    var categories = testUser.categories
+//    // Temporary hard coded values for testing
+//    val categories = listOf(
+//        Category("Home"),
+//        Category("Work"),
+//        Category("Chores")
+//    )
 
     // Temporary hard coded values for testing
-    val tasks = remember { mutableStateListOf(
-        Task("Task 1", categories[0], "High", "Easy", false),
-        Task("Task 2", categories[1], "Medium", "Medium", false),
-        Task("Task 3", categories[2], "Low", "Hard", false),
-        Task("Task 4", categories[0], "High", "Easy", false)
-    )}
+//    val tasks = remember { mutableStateListOf(
+//        Task("Task 1", categories[0], "High", "Easy", false),
+//        Task("Task 2", categories[1], "Medium", "Medium", false),
+//        Task("Task 3", categories[2], "Low", "Hard", false),
+//        Task("Task 4", categories[0], "High", "Easy", false)
+//    )}
+    var tasks = testUser.currentTasks
 
     // State to track if the category dropdown menu is open
     var expanded by remember { mutableStateOf(false) }
@@ -159,7 +155,7 @@ fun TaskPageLayout(
                                 .padding(5.dp)
                         ) {
                             Text(
-                                text = category.name,
+                                text = category.getName(),
                                 modifier = Modifier.padding(8.dp)
                             )
                         }
@@ -227,7 +223,7 @@ fun CustomDropdownMenu(
     ) {
         categories.forEach { category ->
             DropdownMenuItem(
-                text = { Text(category.name) },
+                text = { Text(category.getName()) },
                 trailingIcon = {
                     Switch(
                         modifier = Modifier

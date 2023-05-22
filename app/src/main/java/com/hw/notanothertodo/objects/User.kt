@@ -7,15 +7,22 @@ class User (
     val email: String
     )
 {
-    val currentTasks : HashMap<Int, Task> = HashMap()
-    val archivedTasks: HashMap<Int, Task> = HashMap()
+    val currentTasks : MutableList<Task> = ArrayList()
+    val archivedTasks: MutableList<Task> = ArrayList()
     private var currentPoints: Int = 0
     private var lifetimePoints: Int = 0
     private var nextTaskID: Int = 0
-    var categories: HashMap<String, HashMap<String, Task>> = HashMap()
+    var categories: MutableList<Category> = ArrayList()
 
     fun startUp(){
-        addCategory("default")
+        addCategory(Category("default"))
+        addCategory(Category("chores"))
+        addCategory(Category("home"))
+        addCategory(Category("work"))
+        addTask(Task("Task 1", categories[0], "High", "Hard", false))
+        addTask(Task("Task 2", categories[1], "Medium", "Medium", false))
+        addTask(Task("Task 3", categories[2], "Low", "Hard", false))
+        addTask(Task("Task 4", categories[0], "Medium", "Easy", false))
     }
 
     fun getLifetimePoints(): Int {
@@ -38,21 +45,19 @@ class User (
         return nextTaskID
     }
     fun addTask(task: Task){
-        currentTasks[task.id] = task
-        nextTaskID++
+        currentTasks.add(task)
         //to do: categories solution
 
     }
 
     fun archiveTask(task: Task){
-        currentTasks.remove(task.id)
-        archivedTasks[task.id] = task
-        addPoints(task.pointValue)
+        currentTasks.remove(task)
+        archivedTasks.add(task)
     }
 
 
     fun deleteTask(task: Task){
-        currentTasks.remove(task.id)
+        currentTasks.remove(task)
     }
 
     private fun minusCurrPoints(points: Int){
@@ -73,16 +78,16 @@ class User (
         minusCurrPoints(prize.cost)
     }
 
-    fun addCategory(cat: String){
-        if (categories.containsKey(cat)){
+    fun addCategory(cat: Category){
+        if (categories.contains(cat)){
            return
         }
         val newMap = HashMap<String, Task>()
-        categories[cat] = newMap
+        categories.add(cat)
     }
 
-    private fun removeCategory(cat: String){
-        if (!categories.containsKey(cat)){
+    private fun removeCategory(cat: Category){
+        if (!categories.contains(cat)){
             return
         }
         categories.remove(cat)
