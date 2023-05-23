@@ -50,20 +50,6 @@ fun TaskScreen(
     val testUser: User = User("jason", "jason@hotmail.com")
     testUser.startUp()
     var categories = testUser.categories
-//    // Temporary hard coded values for testing
-//    val categories = listOf(
-//        Category("Home"),
-//        Category("Work"),
-//        Category("Chores")
-//    )
-
-    // Temporary hard coded values for testing
-//    val tasks = remember { mutableStateListOf(
-//        Task("Task 1", categories[0], "High", "Easy", false),
-//        Task("Task 2", categories[1], "Medium", "Medium", false),
-//        Task("Task 3", categories[2], "Low", "Hard", false),
-//        Task("Task 4", categories[0], "High", "Easy", false)
-//    )}
     var tasks = testUser.currentTasks
 
     // State to track if the category dropdown menu is open
