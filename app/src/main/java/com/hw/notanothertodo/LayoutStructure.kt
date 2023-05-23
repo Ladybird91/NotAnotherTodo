@@ -70,7 +70,7 @@ fun CustomLayoutStructure() {
                             selected = selectedPage == index,
                             onClick = {
                                 selectedPage = index
-                                navController.navigate(data.second)
+                                //navController.navigate(data.second)
                             }
                         )
                     }

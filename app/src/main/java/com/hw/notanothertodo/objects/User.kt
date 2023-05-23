@@ -15,10 +15,10 @@ class User (
     var categories: MutableList<Category> = ArrayList()
 
     fun startUp(){
-        addCategory(Category("default"))
-        addCategory(Category("chores"))
-        addCategory(Category("home"))
-        addCategory(Category("work"))
+        addCategory(Category("Default"))
+        addCategory(Category("Chores"))
+        addCategory(Category("Home"))
+        addCategory(Category("Work"))
         addTask(Task("Task 1", categories[0], "High", "Hard", false))
         addTask(Task("Task 2", categories[1], "Medium", "Medium", false))
         addTask(Task("Task 3", categories[2], "Low", "Hard", false))
