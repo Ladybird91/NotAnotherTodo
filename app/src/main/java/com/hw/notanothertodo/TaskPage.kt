@@ -150,7 +150,7 @@ fun TaskScreen(
                                 .padding(5.dp)
                         ) {
                             Text(
-                                text = category.getName(),
+                                text = category.name,
                                 modifier = Modifier.padding(8.dp)
                             )
                         }
@@ -218,7 +218,7 @@ fun CustomDropdownMenu(
     ) {
         categories.forEach { category ->
             DropdownMenuItem(
-                text = { Text(category.getName()) },
+                text = { Text(category.name) },
                 trailingIcon = {
                     Switch(
                         modifier = Modifier
