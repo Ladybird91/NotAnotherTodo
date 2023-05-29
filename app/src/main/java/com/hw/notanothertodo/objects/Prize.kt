@@ -1,6 +1,6 @@
 package com.hw.notanothertodo.objects
 
-class Prize (
+data class Prize (
     var title: String,
     var cost: Int,
     var isStarred: Boolean,
