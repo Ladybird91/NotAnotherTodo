@@ -1,18 +1,21 @@
 package com.hw.notanothertodo.objects
 
-import android.icu.text.CaseMap.Title
+import androidx.compose.runtime.mutableStateListOf
+
 
 class User (
     var name: String,
     val email: String
     )
 {
-    val currentTasks : MutableList<Task> = ArrayList()
+    val currentTasks = mutableStateListOf<Task>()
+
     val archivedTasks: MutableList<Task> = ArrayList()
     private var currentPoints: Int = 0
     private var lifetimePoints: Int = 0
     private var nextTaskID: Int = 0
     var categories: MutableList<Category> = ArrayList()
+
 
     fun startUp(){
         addCategory(Category("Default"))
@@ -20,10 +23,11 @@ class User (
         addCategory(Category("Home"))
         addCategory(Category("Work"))
         addTask(Task("Task 1", categories[0], "High", "Hard", false))
-        addTask(Task("Task 2", categories[1], "Medium", "Medium", false))
+        addTask(Task("Task 2", categories[1], "Medium", "Moderate", false))
         addTask(Task("Task 3", categories[2], "Low", "Hard", false))
         addTask(Task("Task 4", categories[0], "Medium", "Easy", false))
     }
+
 
     fun getLifetimePoints(): Int {
         return lifetimePoints
@@ -92,6 +96,4 @@ class User (
         }
         categories.remove(cat)
     }
-
-
 }
