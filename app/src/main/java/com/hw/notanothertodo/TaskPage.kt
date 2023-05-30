@@ -1,5 +1,6 @@
 package com.hw.notanothertodo
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,19 +11,34 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSizeIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.SaveAs
+import androidx.compose.material.icons.outlined.PriorityHigh
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -40,20 +56,28 @@ import com.hw.notanothertodo.objects.Task
 import com.hw.notanothertodo.objects.User
 
 
-
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TaskScreen(
-    contentPadding: PaddingValues = PaddingValues()
-) {
-    val testUser: User = User("jason", "jason@hotmail.com")
+fun TaskScreen(contentPadding: PaddingValues = PaddingValues()) {
+
+    val testUser = User("jason", "jason@hotmail.com")
     testUser.startUp()
     var categories = testUser.categories
-    var tasks = testUser.currentTasks
+    val tasks = remember{
+        testUser.currentTasks
+    }
+
+    tasks.forEach {
+
+        Log.d("tasks_tasks", "$it")
+    }
+
 
     // State to track if the category dropdown menu is open
     var expanded by remember { mutableStateOf(false) }
+    var showTaskBottomSheet by remember { mutableStateOf(false) }
+
+
 
     // State to track if what categories are Switched on or off
     val categoryCheckedState = remember {
@@ -119,72 +143,99 @@ fun TaskScreen(
                 Text("Difficulty")
             }
         }
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
-        ) {
-            val groupedTasks = tasks.groupBy { it.category }
-            // Shows categories on screen that haven't been switched off
-            categories.forEach { category ->
-                if (categoryCheckedState[category] == true) {
-                    // Sticky header for each category
-                    stickyHeader {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color.LightGray.copy(alpha = 0.4f), shape = RoundedCornerShape(4.dp))
-                                .padding(5.dp)
-                        ) {
-                            Text(
-                                text = category.name,
-                                modifier = Modifier.padding(8.dp)
-                            )
-                        }
-                    }
-                    // List of tasks under each category
-                    items(groupedTasks[category] ?: emptyList()) { task ->
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 3.dp)
-                                .border(1.dp, Color.Gray.copy(alpha = 0.4f), shape = RoundedCornerShape(4.dp))
-                        ) {
-                            Row(
+        Box(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                //modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
+            ) {
+                val groupedTasks = tasks.groupBy { it.category }
+                // Shows categories on screen that haven't been switched off
+                categories.forEach { category ->
+                    if (categoryCheckedState[category] == true) {
+                        // Sticky header for each category
+                        stickyHeader {
+                            Box(
                                 modifier = Modifier
-                                    .padding(vertical = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                // Color coded based on difficulty Checkbox for task
-                                Checkbox(
-                                    checked = checkboxCheckedState[task] ?: false,
-                                    onCheckedChange = { isChecked ->
-                                        checkboxCheckedState[task] = isChecked
-                                        task.checked = isChecked
-                                    },
-                                    colors = CheckboxDefaults.colors(
-                                        uncheckedColor = getDifficultyColor(task.difficulty),
-                                        checkedColor = getDifficultyColor(task.difficulty)
+                                    .fillMaxWidth()
+                                    .background(
+                                        Color.LightGray.copy(alpha = 0.4f),
+                                        shape = RoundedCornerShape(4.dp)
                                     )
-                                )
-                                // Task name
+                                    .padding(5.dp)
+                            ) {
                                 Text(
-                                    text = task.name,
-                                    modifier = Modifier.padding(start = 1.dp)
+                                    text = category.name,
+                                    modifier = Modifier.padding(8.dp)
                                 )
-                                // Priority icons - Will find another approach to show priority that clutters screen less
-//                                repeat(getPriorityIconCount(task.priority)) {
-//                                    Icon(
-//                                        imageVector = Icons.Outlined.PriorityHigh,
-//                                        contentDescription = "Priority High",
-//                                        modifier = Modifier
-//                                            .padding(start = 0.dp, end = 0.dp)
-//                                    )
-//                                }
+                            }
+                        }
+                        // List of tasks under each category
+                        items(groupedTasks[category] ?: emptyList()) { task ->
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 3.dp)
+                                    .border(
+                                        1.dp,
+                                        Color.Gray.copy(alpha = 0.4f),
+                                        shape = RoundedCornerShape(4.dp)
+                                    )
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .padding(vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    // Color coded based on difficulty Checkbox for task
+                                    Checkbox(
+                                        checked = checkboxCheckedState[task] ?: false,
+                                        onCheckedChange = { isChecked ->
+                                            checkboxCheckedState[task] = isChecked
+                                            task.checked = isChecked
+                                        },
+                                        colors = CheckboxDefaults.colors(
+                                            uncheckedColor = getDifficultyColor(task.difficulty),
+                                            checkedColor = getDifficultyColor(task.difficulty)
+                                        )
+                                    )
+                                    // Task name
+                                    Text(
+                                        text = task.name,
+                                        modifier = Modifier.padding(start = 1.dp)
+                                    )
+                                    // Priority icons - Will find another approach to show priority that clutters screen less
+                                    PriorityIcons(task.priority)
+                                }
                             }
                         }
                     }
                 }
             }
+            // Custom floating action button for adding tasks
+            Box(
+                contentAlignment = Alignment.BottomEnd,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                TaskFloatingActionButton(
+                    onClick = { showTaskBottomSheet = true }
+                )
+            }
+        }
+
+        if (showTaskBottomSheet) {
+            TaskBottomSheet(
+                padding = contentPadding,
+                showTaskBottomSheet = showTaskBottomSheet,
+                categories = categories,
+                onClose = { showTaskBottomSheet = false },
+                onTaskSave = { newTask ->
+                    tasks.add(newTask)
+                    showTaskBottomSheet = false
+                    Log.d("NewTask", "Name: ${newTask.name}, Category: ${newTask.category}, Priority: ${newTask.priority}, Difficulty: ${newTask.difficulty}")
+                }
+            )
         }
     }
 }
@@ -200,6 +251,7 @@ fun CustomDropdownMenu(
 ) {
     DropdownMenu(
         expanded = expanded,
+        modifier = Modifier.requiredSizeIn(maxHeight = 300.dp),
         onDismissRequest = { onExpandedChange(false) }
     ) {
         categories.forEach { category ->
@@ -232,21 +284,221 @@ fun CustomDropdownMenu(
 fun getDifficultyColor(difficulty: String): Color {
     return when (difficulty) {
         "Easy" -> Color.Green
-        "Medium" -> Color.Blue
+        "Moderate" -> Color.Blue
         "Hard" -> Color.Red
         else -> Color.Gray
     }
 }
 
-// Get the number of priority icons to display based on the task priority
-//fun getPriorityIconCount(priority: String): Int {
-//    return when (priority) {
-//        "High" -> 2
-//        "Medium" -> 1
-//        else -> 0
-//    }
-//}
+// IF priority icon is displayed and icon color
+@Composable
+fun PriorityIcons(priority: String) {
+    val iconTint = when (priority) {
+        "Low" -> null // No icon for Low priority
+        "Medium" -> Color.Blue // Blue tint for Medium priority
+        "High" -> Color.Red // Red tint for High priority
+        else -> null
+    }
 
+    if (priority != "Low") {
+        if (iconTint != null) {
+            Icon(
+                imageVector = Icons.Outlined.PriorityHigh,
+                contentDescription = "Priority High",
+                modifier = Modifier.padding(start = 0.dp, end = 0.dp),
+                tint = iconTint
+            )
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TaskBottomSheet(
+    padding: PaddingValues = PaddingValues(),
+    showTaskBottomSheet: Boolean,
+    categories: List<Category>,
+    onClose: () -> Unit,
+    onTaskSave: (Task) -> Unit
+) {
+    var isDifficultyMenuExpanded by remember { mutableStateOf(false) }
+    var isPriorityMenuExpanded by remember { mutableStateOf(false) }
+    var isCategoryMenuExpanded by remember { mutableStateOf(false) }
+
+    val difficultyOptions = listOf("Easy", "Moderate", "Hard")
+    var selectedDifficulty by remember { mutableStateOf("") }
+    val priorityOptions = listOf("Low", "Medium", "High")
+    var selectedPriority by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf(Category("")) }
+    var taskName by remember { mutableStateOf("") }
+
+    if (showTaskBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = onClose,
+            sheetState = rememberModalBottomSheetState()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(15.dp)
+                    //.fillMaxSize()
+                ) {
+                    // User input field
+                    TextField(
+                        value = taskName,
+                        onValueChange = { taskName = it },
+                        label = { Text("Input new task here") }
+                    )
+                    Spacer(modifier = Modifier.height(40.dp))
+
+                    // Category button
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        //  .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        Column {
+
+                            Box(
+                                modifier = Modifier
+                                    .offset(y = (-10).dp)
+                                    .padding(bottom = 40.dp)
+                            ) {
+                                ElevatedButton(onClick = { isCategoryMenuExpanded = true }) {
+                                    Text(selectedCategory.name.ifBlank { "Category" })
+                                }
+                            }
+
+                            DropdownMenu(
+                                expanded = isCategoryMenuExpanded,
+                                onDismissRequest = { isCategoryMenuExpanded = false },
+                                modifier = Modifier.requiredSizeIn(maxHeight = 160.dp)
+                            ) {
+                                categories.forEach { category ->
+                                    DropdownMenuItem(
+                                        text = { Text(category.name) },
+                                        onClick = {
+                                            selectedCategory = category
+                                            isCategoryMenuExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+
+                        // Difficulty button
+                        Column {
+                            Box(
+                                modifier = Modifier
+                                    .offset(y = (-10).dp)
+                                    .padding(bottom = 40.dp)
+                            ) {
+                                ElevatedButton(onClick = { isDifficultyMenuExpanded = true }) {
+                                    Text(selectedDifficulty.ifBlank { "Difficulty" })
+                                }
+                            }
+                            DropdownMenu(
+                                expanded = isDifficultyMenuExpanded,
+                                onDismissRequest = { isDifficultyMenuExpanded = false }
+                            ) {
+                                difficultyOptions.forEach { option ->
+                                    DropdownMenuItem(
+                                        text = { Text(option) },
+                                        onClick = {
+                                            selectedDifficulty = option
+                                            isDifficultyMenuExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+
+                        // Priority button
+                        Column {
+                            Box(
+                                modifier = Modifier
+                                    .offset(y = (-10).dp)
+                                    .padding(bottom = 40.dp)
+                            ) {
+                                ElevatedButton(onClick = { isPriorityMenuExpanded = true }) {
+                                    Text(selectedPriority.ifBlank { "Priority" })
+                                }
+                            }
+                            DropdownMenu(
+                                expanded = isPriorityMenuExpanded,
+                                onDismissRequest = { isPriorityMenuExpanded = false }
+                            ) {
+                                priorityOptions.forEach { option ->
+                                    DropdownMenuItem(
+                                        text = { Text(option) },
+                                        onClick = {
+                                            selectedPriority = option
+                                            isPriorityMenuExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+
+                    Spacer(modifier = Modifier.height(100.dp))
+                    // Icon in lower right corner
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clickable {
+                                    val newTask = Task(
+                                        name = taskName,
+                                        category = selectedCategory,
+                                        priority = selectedPriority,
+                                        difficulty = selectedDifficulty,
+                                        checked = false
+                                    )
+                                    onTaskSave(newTask)
+                                    onClose()
+                                }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.SaveAs,
+                                contentDescription = "Input Button to save new task",
+                                modifier = Modifier.size(40.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+// Custom floating action button for adding tasks
+@Composable
+fun TaskFloatingActionButton(
+    onClick: () -> Unit
+) {
+    FloatingActionButton(
+        onClick = onClick,
+        modifier = Modifier
+            .size(75.dp)
+            .padding(7.dp)
+    ) {
+        Icon(Icons.Filled.Add, contentDescription = "FAB Add Icon")
+    }
+}
 
 
 
