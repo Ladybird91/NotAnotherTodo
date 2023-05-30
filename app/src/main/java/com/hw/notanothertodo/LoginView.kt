@@ -123,7 +123,7 @@ fun LoginView() {
 
                         Row(modifier = Modifier.fillMaxWidth(),Arrangement.Center,verticalAlignment = Alignment.CenterVertically) {
                             Text(text = "New User?",fontSize = 14.sp)
-                            TextButton(onClick = { /*TODO*/ }) {
+                            TextButton(onClick = {}) {
                                 Text(text = "Create Profile")
                             }
                         }
