@@ -22,10 +22,10 @@ class User (
         addCategory(Category("Chores"))
         addCategory(Category("Home"))
         addCategory(Category("Work"))
-        addTask(Task("Task 1", categories[0], "High", "Hard", false))
-        addTask(Task("Task 2", categories[1], "Medium", "Moderate", false))
-        addTask(Task("Task 3", categories[2], "Low", "Hard", false))
-        addTask(Task("Task 4", categories[0], "Medium", "Easy", false))
+        addTask(Task("Task 1", categories[0], "High", "Hard", 23))
+        addTask(Task("Task 2", categories[1], "Medium", "Moderate", 36))
+        addTask(Task("Task 3", categories[2], "Low", "Hard", 10))
+        addTask(Task("Task 4", categories[0], "Medium", "Easy", 26))
     }
 
 

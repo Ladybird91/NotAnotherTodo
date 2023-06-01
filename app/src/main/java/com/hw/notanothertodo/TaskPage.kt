@@ -1,6 +1,10 @@
 package com.hw.notanothertodo
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -34,6 +38,7 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -50,11 +55,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.hw.notanothertodo.objects.Category
 import com.hw.notanothertodo.objects.Task
 import com.hw.notanothertodo.objects.User
-
+import com.hw.notanothertodo.objects.calculatePoints
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -63,20 +69,18 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues()) {
     val testUser = User("jason", "jason@hotmail.com")
     testUser.startUp()
     var categories = testUser.categories
-    val tasks = remember{
+    val tasks = remember {
         testUser.currentTasks
     }
 
-    tasks.forEach {
-
-        Log.d("tasks_tasks", "$it")
-    }
-
+//    tasks.forEach {
+//
+//        Log.d("tasks_tasks", "$it")
+//    }
 
     // State to track if the category dropdown menu is open
     var expanded by remember { mutableStateOf(false) }
     var showTaskBottomSheet by remember { mutableStateOf(false) }
-
 
 
     // State to track if what categories are Switched on or off
@@ -99,6 +103,31 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues()) {
 
     // State to track the selected categories
     var selectedCategories by remember { mutableStateOf(emptyList<Category>()) }
+
+    // // State to track the Checkboxes checked state for points animation
+    val animatePoints = remember {
+        mutableStateMapOf<Task, Boolean>().apply {
+            tasks.forEach { task ->
+                this[task] = task.checked
+            }
+        }
+    }
+
+    // Show point animation for limited time - in progress
+    // LaunchedEffect(animatePoints) {
+    //    animatePoints.entries
+    //        .filter { it.value }
+    //        .forEach { (task, _) ->
+    //            launch {
+    //                delay(2000) // Adjust the duration as needed (e.g., 2000ms = 2 seconds)
+    //                setState {
+    //                    animatePoints[task] = false
+    //                }
+    //            }
+    //        }
+    //}
+
+
 
     Column(
         modifier = Modifier
@@ -192,6 +221,7 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues()) {
                                         onCheckedChange = { isChecked ->
                                             checkboxCheckedState[task] = isChecked
                                             task.checked = isChecked
+                                            animatePoints[task] = isChecked
                                         },
                                         colors = CheckboxDefaults.colors(
                                             uncheckedColor = getDifficultyColor(task.difficulty),
@@ -203,8 +233,20 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues()) {
                                         text = task.name,
                                         modifier = Modifier.padding(start = 1.dp)
                                     )
-                                    // Priority icons - Will find another approach to show priority that clutters screen less
                                     PriorityIcons(task.priority)
+                                    AnimatedVisibility(
+                                        visible = animatePoints[task] ?: false,
+                                        enter = fadeIn(animationSpec = tween(durationMillis = 1000)),
+                                        exit = fadeOut(animationSpec = tween(durationMillis = 1000))
+                                    ) {
+                                        Text(
+                                            text = "+" + task.points.toString(),
+                                            color = Color.DarkGray,
+                                            style = MaterialTheme.typography.headlineMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(start = 8.dp)
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -233,7 +275,10 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues()) {
                 onTaskSave = { newTask ->
                     tasks.add(newTask)
                     showTaskBottomSheet = false
-                    Log.d("NewTask", "Name: ${newTask.name}, Category: ${newTask.category}, Priority: ${newTask.priority}, Difficulty: ${newTask.difficulty}")
+                    Log.d(
+                        "NewTask",
+                        "Name: ${newTask.name}, Category: ${newTask.category}, Priority: ${newTask.priority}, Difficulty: ${newTask.difficulty}"
+                    )
                 }
             )
         }
@@ -464,9 +509,12 @@ fun TaskBottomSheet(
                                         name = taskName,
                                         category = selectedCategory,
                                         priority = selectedPriority,
-                                        difficulty = selectedDifficulty,
-                                        checked = false
+                                        difficulty = selectedDifficulty
                                     )
+
+                                    val points = newTask.calculatePoints()
+                                    newTask.points = points
+
                                     onTaskSave(newTask)
                                     onClose()
                                 }
@@ -499,6 +547,8 @@ fun TaskFloatingActionButton(
         Icon(Icons.Filled.Add, contentDescription = "FAB Add Icon")
     }
 }
+
+
 
 
 
