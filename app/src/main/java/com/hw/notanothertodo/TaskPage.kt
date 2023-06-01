@@ -57,6 +57,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.hw.notanothertodo.objects.Category
 import com.hw.notanothertodo.objects.Task
 import com.hw.notanothertodo.objects.User
@@ -65,7 +67,7 @@ import com.hw.notanothertodo.objects.calculatePoints
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TaskScreen(contentPadding: PaddingValues = PaddingValues()) {
-
+    val db = Firebase.firestore
     val testUser = User("jason", "jason@hotmail.com")
     testUser.startUp()
     var categories = testUser.categories
