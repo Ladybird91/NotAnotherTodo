@@ -9,9 +9,9 @@ class User (
     )
 {
     val currentTasks = mutableStateListOf<Task>()
-
+    val currentPrizes = mutableStateListOf<Prize>()
     val archivedTasks: MutableList<Task> = ArrayList()
-    private var currentPoints: Int = 0
+    private var currentPoints: Int = 438
     private var lifetimePoints: Int = 0
     private var nextTaskID: Int = 0
     var categories: MutableList<Category> = ArrayList()
@@ -26,6 +26,13 @@ class User (
         addTask(Task("Task 2", categories[1], "Medium", "Moderate", 36))
         addTask(Task("Task 3", categories[2], "Low", "Hard", 10))
         addTask(Task("Task 4", categories[0], "Medium", "Easy", 26))
+    }
+
+    fun startUpPrize(){
+        addPrize(Prize("IceScream scoop", "Cheap",47))
+        addPrize(Prize("IceScream pint", "Affordable",112))
+        addPrize(Prize("Buy Reformation dress", "Premium",589))
+        addPrize(Prize("Buy new houseplant", "Mid-range",235))
     }
 
 
@@ -62,6 +69,10 @@ class User (
 
     fun deleteTask(task: Task){
         currentTasks.remove(task)
+    }
+
+    fun addPrize(prize: Prize){
+        currentPrizes.add(prize)
     }
 
     private fun minusCurrPoints(points: Int){

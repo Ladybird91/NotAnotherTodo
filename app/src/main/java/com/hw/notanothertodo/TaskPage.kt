@@ -393,7 +393,7 @@ fun TaskBottomSheet(
                 Column(
                     modifier = Modifier
                         .padding(15.dp)
-                    //.fillMaxSize()
+                        .fillMaxSize()
                 ) {
                     // User input field
                     TextField(
@@ -401,20 +401,19 @@ fun TaskBottomSheet(
                         onValueChange = { taskName = it },
                         label = { Text("Input new task here") }
                     )
-                    Spacer(modifier = Modifier.height(40.dp))
+                    Spacer(modifier = Modifier.height(1.dp))
 
                     // Category button
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth(),
-                        //  .padding(16.dp),
+                            .fillMaxWidth()
+                            .padding(5.dp),
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
                         Column {
-
                             Box(
                                 modifier = Modifier
-                                    .offset(y = (-10).dp)
+                                    .offset(y = (-40).dp)
                                     .padding(bottom = 40.dp)
                             ) {
                                 ElevatedButton(onClick = { isCategoryMenuExpanded = true }) {
@@ -444,7 +443,7 @@ fun TaskBottomSheet(
                         Column {
                             Box(
                                 modifier = Modifier
-                                    .offset(y = (-10).dp)
+                                    .offset(y = (-40).dp)
                                     .padding(bottom = 40.dp)
                             ) {
                                 ElevatedButton(onClick = { isDifficultyMenuExpanded = true }) {
@@ -472,7 +471,7 @@ fun TaskBottomSheet(
                         Column {
                             Box(
                                 modifier = Modifier
-                                    .offset(y = (-10).dp)
+                                    .offset(y = (-40).dp)
                                     .padding(bottom = 40.dp)
                             ) {
                                 ElevatedButton(onClick = { isPriorityMenuExpanded = true }) {
@@ -497,7 +496,7 @@ fun TaskBottomSheet(
                     }
 
 
-                    Spacer(modifier = Modifier.height(100.dp))
+                    Spacer(modifier = Modifier.height(180.dp))
                     // Icon in lower right corner
                     Row(
                         modifier = Modifier.fillMaxWidth(),
