@@ -2,6 +2,7 @@ package com.hw.notanothertodo
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -27,40 +28,44 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.hw.notanothertodo.ui.theme.md_theme_dark_background
+import com.hw.notanothertodo.ui.theme.md_theme_light_secondary
+import com.hw.notanothertodo.ui.theme.md_theme_light_tertiaryContainer
+
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 @Preview
 fun LoginView() {
+    Modifier.background(md_theme_light_secondary)
 
     val emailValue = remember { mutableStateOf("") }
-    val passwordValue = remember { mutableStateOf("") }
-    val passwordVisibility = remember { mutableStateOf(false) }
-
     Scaffold() {
         Column(
-            Modifier.fillMaxSize(),
+
+            Modifier.fillMaxSize()
+                .background(md_theme_light_secondary),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+            verticalArrangement = Arrangement.Center
         ) {
             Image(
-                painter = painterResource(id = R.drawable.passionflower_choice_two),
+                painter = painterResource(id = R.drawable.passionflower_todo),
                 contentDescription = "App Logo",
                 modifier = Modifier
                     .weight(1f)
-                    .size(180.dp),
-                colorFilter = ColorFilter.tint(Color.White)
+                    .size(360.dp)
             )
             Card(
                 Modifier
-                    .weight(2f)
+                    .weight(1f)
                     .padding(12.dp),
-                shape = RoundedCornerShape(30.dp)
+                shape = RoundedCornerShape(30.dp),
             ) {
                 Column(
                     Modifier
                         .fillMaxSize()
                         .padding(32.dp)
+
                 ) {
                     Text(
                         text = "Not Another To Do",
@@ -71,8 +76,10 @@ fun LoginView() {
                             .fillMaxWidth()
                             .wrapContentSize(Alignment.Center)
                     )
+
+                    Spacer(modifier = Modifier.padding(20.dp))
+
                     Column(
-                        Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -87,45 +94,25 @@ fun LoginView() {
                                 .fillMaxWidth(1f)
                         )
 
-                        OutlinedTextField(
-                            value = passwordValue.value,
-                            onValueChange = { passwordValue.value = it },
-                            label = { Text("Password") },
-                            placeholder = { Text(text = "enter password here") },
-                            singleLine = true,
-                            visualTransformation = if (passwordVisibility.value) VisualTransformation.None
-                            else PasswordVisualTransformation(),
-                            modifier = Modifier
-                                .fillMaxWidth(1f)
-                        )
-
                         Spacer(modifier = Modifier.padding(10.dp))
 
                         Button(onClick = {},
                             modifier = Modifier
                                 .fillMaxWidth(1f)
                                 .height(60.dp)) {
-                            Text(text = "Login", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                            Text(text = "Login / Sign Up", fontWeight = FontWeight.Bold, fontSize = 20.sp)
                         }
+
+                        Spacer(modifier = Modifier.padding(20.dp))
+
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),Arrangement.Center
                         ){
                             TextButton(onClick = { /*TODO*/ }) {
-                                Text(text = "Forgot your password?",fontSize = 12.sp)
+                                Text(text = "About",fontSize = 18.sp)
                             }
 
-                        }
-
-
-
-                        Spacer(modifier = Modifier.padding(20.dp))
-
-                        Row(modifier = Modifier.fillMaxWidth(),Arrangement.Center,verticalAlignment = Alignment.CenterVertically) {
-                            Text(text = "New User?",fontSize = 14.sp)
-                            TextButton(onClick = {}) {
-                                Text(text = "Create Profile")
-                            }
                         }
 
                     }
