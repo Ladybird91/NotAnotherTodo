@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.size
@@ -401,7 +400,7 @@ fun TaskBottomSheet(
                         onValueChange = { taskName = it },
                         label = { Text("Input new task here") }
                     )
-                    Spacer(modifier = Modifier.height(1.dp))
+                    Spacer(modifier = Modifier.height(30.dp))
 
                     // Category button
                     Row(
@@ -411,11 +410,7 @@ fun TaskBottomSheet(
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
                         Column {
-                            Box(
-                                modifier = Modifier
-                                    .offset(y = (-40).dp)
-                                    .padding(bottom = 40.dp)
-                            ) {
+                            Box {
                                 ElevatedButton(onClick = { isCategoryMenuExpanded = true }) {
                                     Text(selectedCategory.name.ifBlank { "Category" })
                                 }
@@ -441,11 +436,7 @@ fun TaskBottomSheet(
 
                         // Difficulty button
                         Column {
-                            Box(
-                                modifier = Modifier
-                                    .offset(y = (-40).dp)
-                                    .padding(bottom = 40.dp)
-                            ) {
+                            Box {
                                 ElevatedButton(onClick = { isDifficultyMenuExpanded = true }) {
                                     Text(selectedDifficulty.ifBlank { "Difficulty" })
                                 }
@@ -469,11 +460,7 @@ fun TaskBottomSheet(
 
                         // Priority button
                         Column {
-                            Box(
-                                modifier = Modifier
-                                    .offset(y = (-40).dp)
-                                    .padding(bottom = 40.dp)
-                            ) {
+                            Box {
                                 ElevatedButton(onClick = { isPriorityMenuExpanded = true }) {
                                     Text(selectedPriority.ifBlank { "Priority" })
                                 }

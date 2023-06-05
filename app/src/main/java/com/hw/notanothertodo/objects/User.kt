@@ -2,7 +2,6 @@ package com.hw.notanothertodo.objects
 
 import androidx.compose.runtime.mutableStateListOf
 
-
 class User (
     var name: String,
     val email: String
@@ -18,14 +17,22 @@ class User (
 
 
     fun startUp(){
-        addCategory(Category("Default"))
+        addCategory(Category("Personal"))
         addCategory(Category("Chores"))
-        addCategory(Category("Home"))
+        addCategory(Category("School"))
         addCategory(Category("Work"))
-        addTask(Task("Task 1", categories[0], "High", "Hard", 23))
-        addTask(Task("Task 2", categories[1], "Medium", "Moderate", 36))
-        addTask(Task("Task 3", categories[2], "Low", "Hard", 10))
-        addTask(Task("Task 4", categories[0], "Medium", "Easy", 26))
+        addTask(Task("Dishes", categories[1], "Medium", "Easy", 23))
+        addTask(Task("Groceries", categories[0], "High", "Moderate", 42))
+        addTask(Task("Water plants", categories[1], "Medium", "Easy", 18))
+        addTask(Task("Laundry", categories[1], "Low", "Easy", 10))
+        addTask(Task("Fold laundry", categories[1], "Low", "Easy", 14))
+        addTask(Task("Workout", categories[0], "Medium", "Hard", 40))
+        addTask(Task("Read emails", categories[3], "Medium", "Easy", 26))
+        addTask(Task("Call Andrea", categories[0], "Medium", "Easy", 24))
+        addTask(Task("Finish assignment 7", categories[2], "Medium", "Moderate", 37))
+        addTask(Task("Mid-term test", categories[2], "High", "Hard", 56))
+        addTask(Task("Complete project requirements", categories[3], "Medium", "Moderate", 39))
+
     }
 
     fun startUpPrize(){
