@@ -1,4 +1,4 @@
-package com.hw.notanothertodo
+package com.hw.notanothertodo.services
 
 interface LogService {
     fun logNonFatalCrash(throwable: Throwable)

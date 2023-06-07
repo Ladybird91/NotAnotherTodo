@@ -1,4 +1,4 @@
-package com.hw.notanothertodo
+package com.hw.notanothertodo.services
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

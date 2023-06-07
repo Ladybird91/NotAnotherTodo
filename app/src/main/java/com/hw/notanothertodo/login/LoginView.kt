@@ -1,4 +1,4 @@
-package com.hw.notanothertodo
+package com.hw.notanothertodo.login
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -13,7 +13,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,28 +26,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
+import com.hw.notanothertodo.R
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.hw.notanothertodo.ui.theme.md_theme_light_secondary
 import dagger.hilt.android.lifecycle.HiltViewModel
-
-private lateinit var auth: FirebaseAuth
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 @Preview
 fun LoginView(
-    viewModel: HiltViewModel = HiltViewModel()
-
+    viewModel: LoginModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState
 
     Modifier.background(md_theme_light_secondary)
 
-    val emailValue = remember { mutableStateOf("") }
-    val passwordValue = remember { mutableStateOf("") }
-    val passwordVisibility = remember { mutableStateOf(false) }
+
     Scaffold() {
         Column(
 
-            Modifier.fillMaxSize()
+            Modifier
+                .fillMaxSize()
                 .background(md_theme_light_secondary),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -90,8 +89,8 @@ fun LoginView(
                     ) {
 
                         OutlinedTextField(
-                            value = emailValue.value,
-                            onValueChange = { emailValue.value = it },
+                            value = uiState.email,
+                            onValueChange = { uiState.email = it },
                             label = { Text(text = "E-mail") },
                             placeholder = { Text(text = "enter email here") },
                             singleLine = true,
@@ -100,15 +99,11 @@ fun LoginView(
                         )
 
                         OutlinedTextField(
-                            value = passwordValue.value,
-                            onValueChange = { passwordValue.value = it },
+                            value = uiState.password,
+                            onValueChange = { uiState.password = it },
                             label = { Text("Password") },
                             placeholder = { Text(text = "enter password here") },
                             singleLine = true,
-                            visualTransformation = if (passwordVisibility.value) VisualTransformation.None
-                            else PasswordVisualTransformation(),
-                            modifier = Modifier
-                                .fillMaxWidth(1f)
                         )
 
                         Spacer(modifier = Modifier.padding(10.dp))
