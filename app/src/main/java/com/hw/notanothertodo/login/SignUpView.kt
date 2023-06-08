@@ -15,7 +15,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,22 +30,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.hw.notanothertodo.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.hw.notanothertodo.RESET
-import com.hw.notanothertodo.services.AccountService
-import com.hw.notanothertodo.services.LogService
-import com.hw.notanothertodo.services.NotAnotherViewModel
 import com.hw.notanothertodo.ui.theme.md_theme_light_secondary
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 
-@HiltViewModel
-class SignUpModel @Inject constructor(
-    private val accountService: AccountService,
-    logService: LogService
-) : NotAnotherViewModel(logService) {
-
-    var uiState = mutableStateOf(LoginUiState())
-
-
-
-
+@Composable
+fun SignUpView (
+    openScreen: (String) -> Unit,
+    viewModel: SignUpModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState
 }

@@ -38,11 +38,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 @Preview
 fun LoginView(
     openScreen: (String) -> Unit,
-    viewModel: LoginModel = hiltViewModel()
+    viewModel: LoginModel = hiltViewModel(),
+    onNewValue: (String) -> Unit
 ) {
    val uiState by viewModel.uiState
-    var pass : String = "pass"
-    var em : String = "email"
+
 
     Modifier.background(md_theme_light_secondary)
 
@@ -95,7 +95,7 @@ fun LoginView(
 
                         OutlinedTextField(
                             value = uiState.email,
-                            onValueChange = { uiState.email = it },
+                            onValueChange = { onNewValue(it) },
                             label = { Text(text = "E-mail") },
                             placeholder = { Text(text = "enter email here") },
                             singleLine = true,
@@ -105,7 +105,7 @@ fun LoginView(
 
                         OutlinedTextField(
                             value = uiState.password,
-                            onValueChange = { uiState.password = it },
+                            onValueChange = { onNewValue(it) },
                             label = { Text("Password") },
                             placeholder = { Text(text = "enter password here") },
                             singleLine = true,
@@ -135,7 +135,7 @@ fun LoginView(
 
                         Spacer(modifier = Modifier.padding(10.dp))
 
-                        Button(onClick = { viewModel.onLoginEnter()},
+                        Button(onClick = {viewModel.onLoginEnter()},
                             modifier = Modifier
                                 .fillMaxWidth(1f)
                                 .height(60.dp)) {
