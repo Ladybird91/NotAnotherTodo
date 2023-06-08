@@ -3,7 +3,7 @@ package com.hw.notanothertodo.objects
 import androidx.compose.runtime.mutableStateListOf
 
 class User (
-    var name: String,
+    val id: String = "",
     val email: String
     )
 {

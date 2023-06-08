@@ -13,6 +13,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.hw.notanothertodo.R
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.hw.notanothertodo.RESET
 import com.hw.notanothertodo.ui.theme.md_theme_light_secondary
 import dagger.hilt.android.lifecycle.HiltViewModel
 
@@ -35,9 +37,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 @Composable
 @Preview
 fun LoginView(
+    openScreen: (String) -> Unit,
     viewModel: LoginModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState
+   val uiState by viewModel.uiState
+    var pass : String = "pass"
+    var em : String = "email"
 
     Modifier.background(md_theme_light_secondary)
 
@@ -106,13 +111,35 @@ fun LoginView(
                             singleLine = true,
                         )
 
+/*                        OutlinedTextField(
+                            value = em,
+                            onValueChange = { em = it },
+                            label = { Text(text = "E-mail") },
+                            placeholder = { Text(text = "enter email here") },
+                            singleLine = true,
+                            modifier = Modifier
+                                .fillMaxWidth(1f)
+
+                        )
                         Spacer(modifier = Modifier.padding(10.dp))
 
-                        Button(onClick = {},
+                        OutlinedTextField(
+                            value = pass,
+                            onValueChange = { pass = it },
+                            label = { Text("Password") },
+                            placeholder = { Text(text = "enter password here") },
+                            singleLine = true,
+                            modifier = Modifier
+                                .fillMaxWidth(1f)
+                        )*/
+
+                        Spacer(modifier = Modifier.padding(10.dp))
+
+                        Button(onClick = { viewModel.onLoginEnter()},
                             modifier = Modifier
                                 .fillMaxWidth(1f)
                                 .height(60.dp)) {
-                            Text(text = "Reset Password", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                            Text(text = "Login", fontWeight = FontWeight.Bold, fontSize = 20.sp)
                         }
 
                         Spacer(modifier = Modifier.padding(20.dp))
@@ -129,7 +156,7 @@ fun LoginView(
 
                         Row(modifier = Modifier.fillMaxWidth(),Arrangement.Center,verticalAlignment = Alignment.CenterVertically) {
                             Text(text = "No account?",fontSize = 20.sp)
-                            TextButton(onClick = { /*TODO*/ }) {
+                            TextButton(onClick = {openScreen(RESET)}) {
                                 Text(text = "Sign up!")
                             }
                         }
