@@ -1,6 +1,7 @@
 package com.hw.notanothertodo.objects
 
 import androidx.compose.runtime.mutableStateListOf
+import androidx.lifecycle.ViewModel
 
 class User (
     var name: String,
@@ -10,8 +11,10 @@ class User (
     val currentTasks = mutableStateListOf<Task>()
     val currentPrizes = mutableStateListOf<Prize>()
     val archivedTasks: MutableList<Task> = ArrayList()
+    // Adding int values to these variables for presentation demo
     private var currentPoints: Int = 438
-    private var lifetimePoints: Int = 0
+    private var lifetimePoints: Int = 1574
+    private var taskCompleted: Int = 34
     private var nextTaskID: Int = 0
     var categories: MutableList<Category> = ArrayList()
 
@@ -47,6 +50,11 @@ class User (
         return lifetimePoints
     }
 
+    fun getLifetimeTasksCompleted(): Int {
+        return taskCompleted
+    }
+
+
     fun getCurrentPoints(): Int {
         return currentPoints
     }
@@ -62,6 +70,7 @@ class User (
     fun getNextTaskID(): Int {
         return nextTaskID
     }
+
     fun addTask(task: Task){
         currentTasks.add(task)
         //to do: categories solution
@@ -113,5 +122,14 @@ class User (
             return
         }
         categories.remove(cat)
+    }
+}
+
+class UserViewModel : ViewModel() {
+    val user: User = User("jason", "jason@hotmail.com")
+
+    init {
+        user.startUp()
+        user.startUpPrize()
     }
 }

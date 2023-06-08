@@ -60,24 +60,20 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.hw.notanothertodo.objects.Category
 import com.hw.notanothertodo.objects.Task
-import com.hw.notanothertodo.objects.User
+import com.hw.notanothertodo.objects.UserViewModel
 import com.hw.notanothertodo.objects.calculatePoints
+import androidx.lifecycle.viewmodel.compose.viewModel
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TaskScreen(contentPadding: PaddingValues = PaddingValues()) {
+fun TaskScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserViewModel = viewModel()) {
     val db = Firebase.firestore
-    val testUser = User("jason", "jason@hotmail.com")
-    testUser.startUp()
-    var categories = testUser.categories
-    val tasks = remember {
-        testUser.currentTasks
-    }
 
-//    tasks.forEach {
-//
-//        Log.d("tasks_tasks", "$it")
-//    }
+    var categories = viewModel.user.categories
+    val tasks = remember {
+        viewModel.user.currentTasks
+    }
 
     // State to track if the category dropdown menu is open
     var expanded by remember { mutableStateOf(false) }
@@ -113,22 +109,6 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues()) {
             }
         }
     }
-
-    // Show point animation for limited time - in progress
-    // LaunchedEffect(animatePoints) {
-    //    animatePoints.entries
-    //        .filter { it.value }
-    //        .forEach { (task, _) ->
-    //            launch {
-    //                delay(2000) // Adjust the duration as needed (e.g., 2000ms = 2 seconds)
-    //                setState {
-    //                    animatePoints[task] = false
-    //                }
-    //            }
-    //        }
-    //}
-
-
 
     Column(
         modifier = Modifier
@@ -222,6 +202,11 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues()) {
                                         onCheckedChange = { isChecked ->
                                             checkboxCheckedState[task] = isChecked
                                             task.checked = isChecked
+                                            if (isChecked) {
+                                                viewModel.user.addPoints(task.points)
+                                            } else {
+                                                viewModel.user.minusPoints(task.points)
+                                            }
                                             animatePoints[task] = isChecked
                                         },
                                         colors = CheckboxDefaults.colors(

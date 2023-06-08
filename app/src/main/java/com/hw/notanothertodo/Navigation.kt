@@ -38,7 +38,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-
+import com.hw.notanothertodo.objects.UserViewModel
 
 
 enum class DrawerNavScreens(val route: String, val icon: ImageVector, val title: String) {
@@ -81,16 +81,16 @@ fun navigationDrawerMenu(): List<Pair<ImageVector, String>> {
 @Composable
 fun CustomNavHost(
     navController: NavHostController,
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
+    userViewModel: UserViewModel
 ) {
     NavHost(
         navController,
-        startDestination = BottomNavScreens.Tasks.route,
-        Modifier.padding(innerPadding)
+        startDestination = BottomNavScreens.Tasks.route
     ) {
-        composable(BottomNavScreens.Tasks.route) { TaskScreen() }
-        composable(BottomNavScreens.Prizes.route) { PrizeScreen() }
-        composable(BottomNavScreens.User.route) { UserScreen() }
+        composable(BottomNavScreens.Tasks.route) { TaskScreen(innerPadding, userViewModel) }
+        composable(BottomNavScreens.Prizes.route) { PrizeScreen(innerPadding, userViewModel) }
+        composable(BottomNavScreens.User.route) { UserScreen(innerPadding, userViewModel) }
         composable(DrawerNavScreens.Login.route) { LoginView() }
         composable(DrawerNavScreens.Settings.route) { SettingsScreen() }
         composable(DrawerNavScreens.About.route) { AboutScreen() }

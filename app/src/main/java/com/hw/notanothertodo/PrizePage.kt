@@ -40,18 +40,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hw.notanothertodo.objects.Prize
-import com.hw.notanothertodo.objects.User
+import com.hw.notanothertodo.objects.UserViewModel
 import com.hw.notanothertodo.objects.calculateCost
 
 @Composable
-fun PrizeScreen(contentPadding: PaddingValues = PaddingValues()) {
-    val testUser = User("jason", "jason@hotmail.com")
-    testUser.startUpPrize()
+fun PrizeScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserViewModel = viewModel()) {
+
     val prizes = remember {
-        testUser.currentPrizes
+        viewModel.user.currentPrizes
     }
-    val userPoints = testUser.getCurrentPoints()
+    val userPoints = viewModel.user.getCurrentPoints()
 
     var showPrizeBottomSheet by remember { mutableStateOf(false) }
 

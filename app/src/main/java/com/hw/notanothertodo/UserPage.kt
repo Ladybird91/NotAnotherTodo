@@ -3,6 +3,7 @@ package com.hw.notanothertodo
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,13 +22,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.hw.notanothertodo.objects.UserViewModel
 
 @Composable
-fun UserScreen() {
-    // Temporary hard coded values - use until we figure out passing User info effectively
-    val lifetimePoints = 1574
-    val taskCompleted = 34
-    val pendingTasks = 14
+fun UserScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserViewModel = viewModel()) {
+
+    val lifetimePoints = viewModel.user.getLifetimePoints()
+    val taskCompleted = viewModel.user.getLifetimeTasksCompleted()
+    val pendingTasks = viewModel.user.numCurrentTasks()
 
     Box(
         modifier = Modifier

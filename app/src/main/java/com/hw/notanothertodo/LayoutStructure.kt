@@ -15,13 +15,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.hw.notanothertodo.objects.UserViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomLayoutStructure() {
+    val userViewModel: UserViewModel = viewModel()
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -47,7 +50,7 @@ fun CustomLayoutStructure() {
                 CustomNavigationBar(navController, currentDestination, barItems) {}
             },
         ) { innerPadding ->
-            CustomNavHost(navController, innerPadding)
+            CustomNavHost(navController, innerPadding, userViewModel)
         }
     }
 
