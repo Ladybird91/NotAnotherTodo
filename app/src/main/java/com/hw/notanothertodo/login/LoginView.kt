@@ -37,12 +37,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 @Composable
 @Preview
 fun LoginView(
+    openAndPopUp: (String, String) -> Unit,
     openScreen: (String) -> Unit,
     viewModel: LoginModel = hiltViewModel(),
     onNewValue: (String) -> Unit
 ) {
    val uiState by viewModel.uiState
-
 
     Modifier.background(md_theme_light_secondary)
 
@@ -111,31 +111,9 @@ fun LoginView(
                             singleLine = true,
                         )
 
-/*                        OutlinedTextField(
-                            value = em,
-                            onValueChange = { em = it },
-                            label = { Text(text = "E-mail") },
-                            placeholder = { Text(text = "enter email here") },
-                            singleLine = true,
-                            modifier = Modifier
-                                .fillMaxWidth(1f)
-
-                        )
                         Spacer(modifier = Modifier.padding(10.dp))
 
-                        OutlinedTextField(
-                            value = pass,
-                            onValueChange = { pass = it },
-                            label = { Text("Password") },
-                            placeholder = { Text(text = "enter password here") },
-                            singleLine = true,
-                            modifier = Modifier
-                                .fillMaxWidth(1f)
-                        )*/
-
-                        Spacer(modifier = Modifier.padding(10.dp))
-
-                        Button(onClick = {viewModel.onLoginEnter()},
+                        Button(onClick = { viewModel.onLoginEnter(openAndPopUp)},
                             modifier = Modifier
                                 .fillMaxWidth(1f)
                                 .height(60.dp)) {

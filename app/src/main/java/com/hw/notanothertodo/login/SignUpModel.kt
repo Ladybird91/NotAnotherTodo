@@ -44,9 +44,10 @@ class SignUpModel @Inject constructor(
     logService: LogService
 ) : NotAnotherViewModel(logService) {
 
-    var uiState = mutableStateOf(LoginUiState())
+    var uiState = mutableStateOf(SignUpUiState())
+
+    fun onSignupEnter(openAndPopUp: (String, String) -> Unit){
 
 
-
-
+    }
 }

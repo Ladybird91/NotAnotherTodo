@@ -30,9 +30,13 @@ class LoginModel @Inject constructor(
     fun onPasswordChange(newValue: String) {
         uiState.value = uiState.value.copy(password = newValue)
     }
-    fun onLoginEnter(){
+    fun onLoginEnter(openAndPopUp: (String, String) -> Unit){
+
         launchCatching {
             accountService.authenticate(email, password)
+            openAndPopUp("TaskPage", "SignUpView")
+
+
         }
     }
 
@@ -40,6 +44,6 @@ class LoginModel @Inject constructor(
         return this.isNotBlank() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
     }
 
-    fun onSignUpClick(openScreen: (String) -> Unit) = openScreen(RESET)
+    fun onSignUpClick(openScreen: (String) -> Unit) = openScreen("SignUpView")
 
 }
