@@ -47,7 +47,6 @@ enum class DrawerNavScreens(val route: String, val icon: ImageVector, val title:
     About("about", Icons.Outlined.Info, "About")
 }
 
-
 enum class BottomNavScreens(val route: String, val icon: ImageVector, val title: String) {
     Tasks("tasks", Icons.Outlined.CheckBox, "Tasks"),
     Prizes("prizes", Icons.Outlined.Redeem, "Prizes"),
@@ -68,15 +67,6 @@ fun navigationBarMenu(): List<Triple<ImageVector, String, String>> {
         Triple(screen.icon, screen.title, screen.route)
     }
 }
-
-/*// Returns a list of pairs representing the side navigation drawer menu items
-fun navigationDrawerMenu(): List<Pair<ImageVector, String>> {
-    return listOf(
-        Icons.Outlined.Login to "Login",
-        Icons.Outlined.Settings to "Settings",
-        Icons.Outlined.Info to "About"
-    )
-}*/
 
 @Composable
 fun CustomNavHost(

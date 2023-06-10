@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.SaveAs
 import androidx.compose.material.icons.filled.ShoppingCartCheckout
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
@@ -45,9 +46,9 @@ import com.hw.notanothertodo.objects.Prize
 import com.hw.notanothertodo.objects.UserViewModel
 import com.hw.notanothertodo.objects.calculateCost
 
+
 @Composable
 fun PrizeScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserViewModel = viewModel()) {
-
     val prizes = remember {
         viewModel.user.currentPrizes
     }
@@ -55,15 +56,15 @@ fun PrizeScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: User
 
     var showPrizeBottomSheet by remember { mutableStateOf(false) }
 
-/*
-    // State to track if what prizes are starred - in progress
-    val prizesStaredState = remember {
-        mutableStateMapOf<Prize, Boolean>().apply {
-            prizes.forEach { prize ->
-                this[prize] = prize.isStarred
+    /*
+        // State to track if what prizes are starred - in progress
+        val prizesStaredState = remember {
+            mutableStateMapOf<Prize, Boolean>().apply {
+                prizes.forEach { prize ->
+                    this[prize] = prize.isStarred
+                }
             }
-        }
-    }*/
+        }*/
 
     Column(
         modifier = Modifier
@@ -111,24 +112,57 @@ fun PrizeScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: User
                     ) {
                         Row(
                             modifier = Modifier
-                                .padding(vertical = 8.dp),
+                                .padding(vertical = 2.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
+                            var buttonState by remember { mutableStateOf(ButtonState.Default) }
+                            var isButtonEnabled by remember { mutableStateOf(userPoints >= prize.cost) }
+
                             Text(
                                 text = prize.title,
                                 modifier = Modifier.padding(8.dp)
                             )
                             Spacer(modifier = Modifier.weight(1f))
                             ElevatedButton(
-                                onClick = { /* Handle button click here */ },
-                                modifier = Modifier.padding(start = 8.dp)
+                                onClick = {
+                                    when (buttonState) {
+                                        ButtonState.Default -> {
+                                            buttonState = ButtonState.Confirm
+                                        }
+                                        ButtonState.Confirm -> {
+                                            // Deduct points from user's currentPoints
+                                            viewModel.user.minusPoints(prize.cost)
+
+                                            // Update button state and disable the button
+                                            buttonState = ButtonState.Redeemed
+                                            isButtonEnabled = false
+                                        }
+                                        else -> {
+                                            // Handle other button states if needed
+                                        }
+                                    }
+                                },
+                                shape =  RoundedCornerShape(6.dp),
+                                elevation = ButtonDefaults.elevatedButtonElevation(6.dp),
+                                enabled = isButtonEnabled,
+                                modifier = Modifier.height(55.dp)
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Icon(
-                                        imageVector = Icons.Default.ShoppingCartCheckout,
-                                        contentDescription = "Prize item checkout"
-                                    )
-                                    Text(prize.cost.toString())
+                                    when (buttonState) {
+                                        ButtonState.Default -> {
+                                            Icon(
+                                                imageVector = Icons.Default.ShoppingCartCheckout,
+                                                contentDescription = "Prize item checkout"
+                                            )
+                                            Text(prize.cost.toString())
+                                        }
+                                        ButtonState.Confirm -> {
+                                            Text("Confirm")
+                                        }
+                                        ButtonState.Redeemed -> {
+                                            Text("Redeemed")
+                                        }
+                                    }
                                 }
                             }
 
@@ -151,7 +185,6 @@ fun PrizeScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: User
 
         if (showPrizeBottomSheet) {
             PrizeBottomSheet(
-                padding = contentPadding,
                 showTaskBottomSheet = showPrizeBottomSheet,
                 onClose = { showPrizeBottomSheet = false },
                 onPrizeSave = { newPrize ->
@@ -166,7 +199,6 @@ fun PrizeScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: User
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrizeBottomSheet(
-    padding: PaddingValues = PaddingValues(),
     showTaskBottomSheet: Boolean,
     onClose: () -> Unit,
     onPrizeSave: (Prize) -> Unit
@@ -185,7 +217,6 @@ fun PrizeBottomSheet(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding)
             ) {
                 Column(
                     modifier = Modifier
@@ -204,7 +235,10 @@ fun PrizeBottomSheet(
                     // Cost range button
                     Column {
                         Box {
-                            ElevatedButton(onClick = { isCostMenuExpanded = true }) {
+                            ElevatedButton(
+                                onClick = { isCostMenuExpanded = true },
+                                elevation = ButtonDefaults.elevatedButtonElevation(4.dp)
+                            ) {
                                 Text(selectedCostRange.ifBlank { "Cost Range" })
                             }
                         }
@@ -274,4 +308,10 @@ fun PrizeFloatingActionButton(
     ) {
         Icon(Icons.Filled.Add, contentDescription = "FAB Add Icon")
     }
+}
+
+enum class ButtonState {
+    Default,
+    Confirm,
+    Redeemed
 }
