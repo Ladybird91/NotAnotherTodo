@@ -29,6 +29,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.SaveAs
 import androidx.compose.material.icons.outlined.PriorityHigh
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenu
@@ -123,7 +124,10 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserV
         ) {
             // Category Button with dropdown menu
             Box {
-                ElevatedButton(onClick = { expanded = true }) {
+                ElevatedButton(
+                    onClick = { expanded = true },
+                    elevation = ButtonDefaults.elevatedButtonElevation(5.dp) )
+                {
                     Text("Category")
                 }
                 CustomDropdownMenu(
@@ -144,12 +148,16 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserV
             }
             // Priority Button - Needs to be implemented to sort Priority ratings
             ElevatedButton(
-                onClick = { /* Handle button click */ }
+                onClick = { /* Handle button click */ },
+                elevation = ButtonDefaults.elevatedButtonElevation(5.dp)
             ) {
                 Text("Priority")
             }
             // Difficulty Button - Needs to be implemented to sort Difficulty ratings
-            ElevatedButton(onClick = { /* Handle button click */ }) {
+            ElevatedButton(
+                onClick = { /* Handle button click */ },
+                elevation = ButtonDefaults.elevatedButtonElevation(5.dp)
+            ) {
                 Text("Difficulty")
             }
         }
@@ -254,7 +262,6 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserV
 
         if (showTaskBottomSheet) {
             TaskBottomSheet(
-                padding = contentPadding,
                 showTaskBottomSheet = showTaskBottomSheet,
                 categories = categories,
                 onClose = { showTaskBottomSheet = false },
@@ -310,44 +317,9 @@ fun CustomDropdownMenu(
     }
 }
 
-// Get the corresponding color for a task difficulty level
-@Composable
-fun getDifficultyColor(difficulty: String): Color {
-    return when (difficulty) {
-        "Easy" -> Color.Green
-        "Moderate" -> Color.Blue
-        "Hard" -> Color.Red
-        else -> Color.Gray
-    }
-}
-
-// IF priority icon is displayed and icon color
-@Composable
-fun PriorityIcons(priority: String) {
-    val iconTint = when (priority) {
-        "Low" -> null // No icon for Low priority
-        "Medium" -> Color.Blue // Blue tint for Medium priority
-        "High" -> Color.Red // Red tint for High priority
-        else -> null
-    }
-
-    if (priority != "Low") {
-        if (iconTint != null) {
-            Icon(
-                imageVector = Icons.Outlined.PriorityHigh,
-                contentDescription = "Priority High",
-                modifier = Modifier.padding(start = 0.dp, end = 0.dp),
-                tint = iconTint
-            )
-        }
-    }
-}
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskBottomSheet(
-    padding: PaddingValues = PaddingValues(),
     showTaskBottomSheet: Boolean,
     categories: List<Category>,
     onClose: () -> Unit,
@@ -372,7 +344,6 @@ fun TaskBottomSheet(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding)
             ) {
                 Column(
                     modifier = Modifier
@@ -396,7 +367,10 @@ fun TaskBottomSheet(
                     ) {
                         Column {
                             Box {
-                                ElevatedButton(onClick = { isCategoryMenuExpanded = true }) {
+                                ElevatedButton(
+                                    onClick = { isCategoryMenuExpanded = true },
+                                    elevation = ButtonDefaults.elevatedButtonElevation(4.dp)
+                                ) {
                                     Text(selectedCategory.name.ifBlank { "Category" })
                                 }
                             }
@@ -422,7 +396,10 @@ fun TaskBottomSheet(
                         // Difficulty button
                         Column {
                             Box {
-                                ElevatedButton(onClick = { isDifficultyMenuExpanded = true }) {
+                                ElevatedButton(
+                                    onClick = { isDifficultyMenuExpanded = true },
+                                    elevation = ButtonDefaults.elevatedButtonElevation(4.dp)
+                                ) {
                                     Text(selectedDifficulty.ifBlank { "Difficulty" })
                                 }
                             }
@@ -446,7 +423,10 @@ fun TaskBottomSheet(
                         // Priority button
                         Column {
                             Box {
-                                ElevatedButton(onClick = { isPriorityMenuExpanded = true }) {
+                                ElevatedButton(
+                                    onClick = { isPriorityMenuExpanded = true },
+                                    elevation = ButtonDefaults.elevatedButtonElevation(4.dp)
+                                ) {
                                     Text(selectedPriority.ifBlank { "Priority" })
                                 }
                             }
@@ -518,6 +498,39 @@ fun TaskFloatingActionButton(
             .padding(7.dp)
     ) {
         Icon(Icons.Filled.Add, contentDescription = "FAB Add Icon")
+    }
+}
+
+// Get the corresponding color for a task difficulty level
+@Composable
+fun getDifficultyColor(difficulty: String): Color {
+    return when (difficulty) {
+        "Easy" -> Color.Green
+        "Moderate" -> Color.Blue
+        "Hard" -> Color.Red
+        else -> Color.Gray
+    }
+}
+
+// IF priority icon is displayed and icon color
+@Composable
+fun PriorityIcons(priority: String) {
+    val iconTint = when (priority) {
+        "Low" -> null // No icon for Low priority
+        "Medium" -> Color.Blue // Blue tint for Medium priority
+        "High" -> Color.Red // Red tint for High priority
+        else -> null
+    }
+
+    if (priority != "Low") {
+        if (iconTint != null) {
+            Icon(
+                imageVector = Icons.Outlined.PriorityHigh,
+                contentDescription = "Priority High",
+                modifier = Modifier.padding(start = 0.dp, end = 0.dp),
+                tint = iconTint
+            )
+        }
     }
 }
 
