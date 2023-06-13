@@ -7,9 +7,14 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "tasks")
 data class Task(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val taskID: Int = 0,
     val title: String,
     val priority: String,
     val difficulty: String,
     val points: Int = 0,
-    val completed: Boolean)
+    val completed: Boolean,
+    val userID: Int,
+    val categoryID: Int,
+    )
+
+

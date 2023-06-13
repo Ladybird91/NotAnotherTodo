@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "users")
 data class User(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val userID: Int = 0,
     val name: String = "nope",
     val email: String = "yep",
     val currentPoints: Int = 0,

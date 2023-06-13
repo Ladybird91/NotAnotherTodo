@@ -9,9 +9,10 @@ import com.hw.notanothertodo.objects.Task
 @Entity(tableName = "prizes")
 data class Prize(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val prizeID: Int = 0,
     var title: String,
     val prizeCostRange: String,
     var cost: Int = 0,
-    var isStarred: Boolean = false
+    var isStarred: Boolean = false,
+    val userID: Int
 )

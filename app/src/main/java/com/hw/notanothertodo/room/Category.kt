@@ -8,6 +8,7 @@ import com.hw.notanothertodo.objects.Task
 @Entity(tableName = "categories")
 data class Category(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val name: String
+    val categoryID: Int = 0,
+    val name: String,
+    val userID: Int
 )
