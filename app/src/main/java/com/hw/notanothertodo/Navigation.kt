@@ -72,7 +72,7 @@ fun navigationBarMenu(): List<Triple<ImageVector, String, String>> {
 fun CustomNavHost(
     navController: NavHostController,
     innerPadding: PaddingValues,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
 ) {
     NavHost(
         navController,
@@ -80,7 +80,7 @@ fun CustomNavHost(
     ) {
         composable(BottomNavScreens.Tasks.route) { TaskScreen(innerPadding, userViewModel) }
         composable(BottomNavScreens.Prizes.route) { PrizeScreen(innerPadding, userViewModel) }
-        composable(BottomNavScreens.User.route) { UserScreen(innerPadding, userViewModel) }
+        composable(BottomNavScreens.User.route) { UserScreen(innerPadding) }
         composable(DrawerNavScreens.Login.route) { LoginView() }
         composable(DrawerNavScreens.Settings.route) { SettingsScreen() }
         composable(DrawerNavScreens.About.route) { AboutScreen() }

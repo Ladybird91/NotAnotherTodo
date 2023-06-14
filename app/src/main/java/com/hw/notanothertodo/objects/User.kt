@@ -12,8 +12,8 @@ class User (
     val currentPrizes = mutableStateListOf<Prize>()
     val archivedTasks: MutableList<Task> = ArrayList()
     // Adding int values to these variables for presentation demo
-    private var currentPoints: Int = 438
-    private var lifetimePoints: Int = 1574
+    private var currentPoints: Int = 103
+    private var lifetimePoints: Int = 687
     private var taskCompleted: Int = 34
     private var nextTaskID: Int = 0
     var categories: MutableList<Category> = ArrayList()
@@ -37,14 +37,6 @@ class User (
         addTask(Task("Complete project requirements", categories[3], "Medium", "Moderate", 39))
 
     }
-
-    fun startUpPrize(){
-        addPrize(Prize("IceScream scoop", "Cheap",47))
-        addPrize(Prize("IceScream pint", "Affordable",112))
-        addPrize(Prize("Buy Reformation dress", "Premium",589))
-        addPrize(Prize("Buy new houseplant", "Mid-range",235))
-    }
-
 
     fun getLifetimePoints(): Int {
         return lifetimePoints
@@ -130,6 +122,5 @@ class UserViewModel : ViewModel() {
 
     init {
         user.startUp()
-        user.startUpPrize()
     }
 }
