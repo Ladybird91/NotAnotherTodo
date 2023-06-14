@@ -45,11 +45,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -64,31 +66,40 @@ import com.hw.notanothertodo.objects.Task
 import com.hw.notanothertodo.objects.UserViewModel
 import com.hw.notanothertodo.objects.calculatePoints
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.hw.notanothertodo.objects.User
+
+@Composable
+fun TaskScreen(
+    contentPadding: PaddingValues = PaddingValues(), viewModel: UserViewModel = viewModel()
+) {
+    val db = Firebase.firestore
+
+    val taskViewModel: TaskViewModel = viewModel()
+
+    LaunchedEffect(key1 = Unit) {
+        taskViewModel.addList(viewModel.user.categories)
+    }
+
+    TaskContent(contentPadding, viewModel.user, taskViewModel.selectedTask)
+}
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TaskScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserViewModel = viewModel()) {
-    val db = Firebase.firestore
+fun TaskContent(
+    contentPadding: PaddingValues,
+    user: User,
+    categoryCheckedState: SnapshotStateMap<String, Boolean>
+) {
 
-    var categories = viewModel.user.categories
+    var categories = user.categories
     val tasks = remember {
-        viewModel.user.currentTasks
+        user.currentTasks
     }
 
     // State to track if the category dropdown menu is open
-    var expanded by remember { mutableStateOf(false) }
     var showTaskBottomSheet by remember { mutableStateOf(false) }
 
-
-    // State to track if what categories are Switched on or off
-    val categoryCheckedState = remember {
-        mutableStateMapOf<Category, Boolean>().apply {
-            categories.forEach { category ->
-                this[category] = true
-            }
-        }
-    }
 
     // State to track the Checkboxes checked state for tasks
     val checkboxCheckedState = remember {
@@ -100,7 +111,7 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserV
     }
 
     // State to track the selected categories
-    var selectedCategories by remember { mutableStateOf(emptyList<Category>()) }
+    //var selectedCategories by remember { mutableStateOf(emptyList<Category>()) }
 
     // // State to track the Checkboxes checked state for points animation
     val animatePoints = remember {
@@ -110,6 +121,7 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserV
             }
         }
     }
+
 
     Column(
         modifier = Modifier
@@ -122,30 +134,12 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserV
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            // Category Button with dropdown menu
-            Box {
-                ElevatedButton(
-                    onClick = { expanded = true },
-                    elevation = ButtonDefaults.elevatedButtonElevation(5.dp) )
-                {
-                    Text("Category")
-                }
-                CustomDropdownMenu(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = it },
-                    categories = categories,
-                    categoryCheckedState = categoryCheckedState,
-                    onCategoryClick = { category ->
-                        val isChecked = categoryCheckedState[category] ?: false
-                        categoryCheckedState[category] = !isChecked
-                        selectedCategories = if (isChecked) {
-                            selectedCategories - category
-                        } else {
-                            selectedCategories + category
-                        }
-                    }
-                )
-            }
+
+
+            ExpandBuilder(
+                categoryCheckedState = categoryCheckedState, categories = categories
+            )
+
             // Priority Button - Needs to be implemented to sort Priority ratings
             ElevatedButton(
                 onClick = { /* Handle button click */ },
@@ -169,7 +163,7 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserV
                 val groupedTasks = tasks.groupBy { it.category }
                 // Shows categories on screen that haven't been switched off
                 categories.forEach { category ->
-                    if (categoryCheckedState[category] == true) {
+                    if (categoryCheckedState[category.name] == true) {
                         // Sticky header for each category
                         stickyHeader {
                             Box(
@@ -182,8 +176,7 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserV
                                     .padding(5.dp)
                             ) {
                                 Text(
-                                    text = category.name,
-                                    modifier = Modifier.padding(8.dp)
+                                    text = category.name, modifier = Modifier.padding(8.dp)
                                 )
                             }
                         }
@@ -200,8 +193,7 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserV
                                     )
                             ) {
                                 Row(
-                                    modifier = Modifier
-                                        .padding(vertical = 8.dp),
+                                    modifier = Modifier.padding(vertical = 8.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     // Color coded based on difficulty Checkbox for task
@@ -211,9 +203,9 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserV
                                             checkboxCheckedState[task] = isChecked
                                             task.checked = isChecked
                                             if (isChecked) {
-                                                viewModel.user.addPoints(task.points)
+                                                user.addPoints(task.points)
                                             } else {
-                                                viewModel.user.minusPoints(task.points)
+                                                user.minusPoints(task.points)
                                             }
                                             animatePoints[task] = isChecked
                                         },
@@ -224,8 +216,7 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserV
                                     )
                                     // Task name
                                     Text(
-                                        text = task.name,
-                                        modifier = Modifier.padding(start = 1.dp)
+                                        text = task.name, modifier = Modifier.padding(start = 1.dp)
                                     )
                                     PriorityIcons(task.priority)
                                     AnimatedVisibility(
@@ -254,15 +245,12 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserV
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                TaskFloatingActionButton(
-                    onClick = { showTaskBottomSheet = true }
-                )
+                TaskFloatingActionButton(onClick = { showTaskBottomSheet = true })
             }
         }
 
         if (showTaskBottomSheet) {
-            TaskBottomSheet(
-                showTaskBottomSheet = showTaskBottomSheet,
+            TaskBottomSheet(showTaskBottomSheet = showTaskBottomSheet,
                 categories = categories,
                 onClose = { showTaskBottomSheet = false },
                 onTaskSave = { newTask ->
@@ -272,9 +260,35 @@ fun TaskScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserV
                         "NewTask",
                         "Name: ${newTask.name}, Category: ${newTask.category}, Priority: ${newTask.priority}, Difficulty: ${newTask.difficulty}"
                     )
-                }
-            )
+                })
         }
+    }
+}
+
+@Composable
+fun ExpandBuilder(
+    categoryCheckedState: SnapshotStateMap<String, Boolean>, categories: List<Category>
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        ElevatedButton(
+            onClick = { expanded = true }, elevation = ButtonDefaults.elevatedButtonElevation(5.dp)
+        ) {
+            Text("Category")
+        }
+        CustomDropdownMenu(expanded = expanded,
+            onExpandedChange = { expanded = it },
+            categories = categories,
+            categoryCheckedState = categoryCheckedState,
+            onCategoryClick = { category ->
+//                        val isChecked = categoryCheckedState[category] ?: false
+//                        categoryCheckedState[category] = !isChecked
+//                        selectedCategories = if (isChecked) {
+//                            selectedCategories - category
+//                        } else {
+//                            selectedCategories + category
+//                        }
+            })
     }
 }
 
@@ -284,35 +298,31 @@ fun CustomDropdownMenu(
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     categories: List<Category>,
-    categoryCheckedState: MutableMap<Category, Boolean>,
+    categoryCheckedState: SnapshotStateMap<String, Boolean>,
     onCategoryClick: (Category) -> Unit
 ) {
-    DropdownMenu(
-        expanded = expanded,
+
+    val checkedState = remember {
+        categoryCheckedState
+    }
+
+    DropdownMenu(expanded = expanded,
         modifier = Modifier.requiredSizeIn(maxHeight = 300.dp),
-        onDismissRequest = { onExpandedChange(false) }
-    ) {
+        onDismissRequest = { onExpandedChange(false) }) {
         categories.forEach { category ->
-            DropdownMenuItem(
-                text = { Text(category.name) },
-                trailingIcon = {
-                    Switch(
-                        modifier = Modifier
-                            .semantics {
-                                contentDescription = "Switch to choose which categories to view"
-                            },
-                        checked = categoryCheckedState[category] ?: false,
-                        onCheckedChange = { isChecked ->
-                            categoryCheckedState[category] = isChecked
-                        }
-                    )
-                },
-                onClick = { onCategoryClick(category) },
-                modifier = Modifier.clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) {}
-            )
+
+
+            DropdownMenuItem(text = { Text(category.name) }, trailingIcon = {
+                Switch(modifier = Modifier.semantics {
+                        contentDescription = "Switch to choose which categories to view"
+                    },
+                    checked = checkedState[category.name] == true,
+                    onCheckedChange = { isChecked ->
+                        checkedState[category.name] = isChecked
+                    })
+            }, onClick = { onCategoryClick(category) }, modifier = Modifier.clickable(
+                interactionSource = remember { MutableInteractionSource() }, indication = null
+            ) {})
         }
     }
 }
@@ -338,12 +348,10 @@ fun TaskBottomSheet(
 
     if (showTaskBottomSheet) {
         ModalBottomSheet(
-            onDismissRequest = onClose,
-            sheetState = rememberModalBottomSheetState()
+            onDismissRequest = onClose, sheetState = rememberModalBottomSheetState()
         ) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             ) {
                 Column(
                     modifier = Modifier
@@ -351,11 +359,9 @@ fun TaskBottomSheet(
                         .fillMaxSize()
                 ) {
                     // User input field
-                    TextField(
-                        value = taskName,
+                    TextField(value = taskName,
                         onValueChange = { taskName = it },
-                        label = { Text("Input new task here") }
-                    )
+                        label = { Text("Input new task here") })
                     Spacer(modifier = Modifier.height(30.dp))
 
                     // Category button
@@ -381,13 +387,10 @@ fun TaskBottomSheet(
                                 modifier = Modifier.requiredSizeIn(maxHeight = 160.dp)
                             ) {
                                 categories.forEach { category ->
-                                    DropdownMenuItem(
-                                        text = { Text(category.name) },
-                                        onClick = {
-                                            selectedCategory = category
-                                            isCategoryMenuExpanded = false
-                                        }
-                                    )
+                                    DropdownMenuItem(text = { Text(category.name) }, onClick = {
+                                        selectedCategory = category
+                                        isCategoryMenuExpanded = false
+                                    })
                                 }
                             }
                         }
@@ -403,18 +406,13 @@ fun TaskBottomSheet(
                                     Text(selectedDifficulty.ifBlank { "Difficulty" })
                                 }
                             }
-                            DropdownMenu(
-                                expanded = isDifficultyMenuExpanded,
-                                onDismissRequest = { isDifficultyMenuExpanded = false }
-                            ) {
+                            DropdownMenu(expanded = isDifficultyMenuExpanded,
+                                onDismissRequest = { isDifficultyMenuExpanded = false }) {
                                 difficultyOptions.forEach { option ->
-                                    DropdownMenuItem(
-                                        text = { Text(option) },
-                                        onClick = {
-                                            selectedDifficulty = option
-                                            isDifficultyMenuExpanded = false
-                                        }
-                                    )
+                                    DropdownMenuItem(text = { Text(option) }, onClick = {
+                                        selectedDifficulty = option
+                                        isDifficultyMenuExpanded = false
+                                    })
                                 }
                             }
                         }
@@ -430,18 +428,13 @@ fun TaskBottomSheet(
                                     Text(selectedPriority.ifBlank { "Priority" })
                                 }
                             }
-                            DropdownMenu(
-                                expanded = isPriorityMenuExpanded,
-                                onDismissRequest = { isPriorityMenuExpanded = false }
-                            ) {
+                            DropdownMenu(expanded = isPriorityMenuExpanded,
+                                onDismissRequest = { isPriorityMenuExpanded = false }) {
                                 priorityOptions.forEach { option ->
-                                    DropdownMenuItem(
-                                        text = { Text(option) },
-                                        onClick = {
-                                            selectedPriority = option
-                                            isPriorityMenuExpanded = false
-                                        }
-                                    )
+                                    DropdownMenuItem(text = { Text(option) }, onClick = {
+                                        selectedPriority = option
+                                        isPriorityMenuExpanded = false
+                                    })
                                 }
                             }
                         }
@@ -451,27 +444,24 @@ fun TaskBottomSheet(
                     Spacer(modifier = Modifier.height(180.dp))
                     // Icon in lower right corner
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
+                        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clickable {
-                                    val newTask = Task(
-                                        name = taskName,
-                                        category = selectedCategory,
-                                        priority = selectedPriority,
-                                        difficulty = selectedDifficulty
-                                    )
+                        Box(modifier = Modifier
+                            .size(40.dp)
+                            .clickable {
+                                val newTask = Task(
+                                    name = taskName,
+                                    category = selectedCategory,
+                                    priority = selectedPriority,
+                                    difficulty = selectedDifficulty
+                                )
 
-                                    val points = newTask.calculatePoints()
-                                    newTask.points = points
+                                val points = newTask.calculatePoints()
+                                newTask.points = points
 
-                                    onTaskSave(newTask)
-                                    onClose()
-                                }
-                        ) {
+                                onTaskSave(newTask)
+                                onClose()
+                            }) {
                             Icon(
                                 imageVector = Icons.Filled.SaveAs,
                                 contentDescription = "Input Button to save new task",
@@ -492,8 +482,7 @@ fun TaskFloatingActionButton(
     onClick: () -> Unit
 ) {
     FloatingActionButton(
-        onClick = onClick,
-        modifier = Modifier
+        onClick = onClick, modifier = Modifier
             .size(75.dp)
             .padding(7.dp)
     ) {

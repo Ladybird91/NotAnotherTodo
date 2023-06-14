@@ -1,5 +1,6 @@
 package com.hw.notanothertodo
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +35,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -41,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hw.notanothertodo.objects.Prize
 import com.hw.notanothertodo.objects.UserViewModel
@@ -48,11 +51,16 @@ import com.hw.notanothertodo.objects.calculateCost
 
 
 @Composable
-fun PrizeScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: UserViewModel = viewModel()) {
+fun PrizeScreen(contentPadding: PaddingValues = PaddingValues(), userViewModel: UserViewModel) {
+
+    //val userViewModel: UserViewModel = viewModel()
+    val prizeViewModel: PrizeViewModel = viewModel()
+
     val prizes = remember {
-        viewModel.user.currentPrizes
+        prizeViewModel.prizes
     }
-    val userPoints = viewModel.user.getCurrentPoints()
+
+    val userPoints = userViewModel.user.getCurrentPoints()
 
     var showPrizeBottomSheet by remember { mutableStateOf(false) }
 
@@ -79,12 +87,12 @@ fun PrizeScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: User
         ) {
             // Box displaying userPoints
             Box(
-                modifier = Modifier
-                    .border(
+                modifier = Modifier.border(
                         3.dp,
                         Color(0xFF897A9E).copy(alpha = 0.3f),
                         shape = RoundedCornerShape(10.dp)
-            )){
+                    )
+            ) {
                 Text(
                     text = "Current Points: $userPoints",
                     style = MaterialTheme.typography.headlineSmall,
@@ -111,16 +119,26 @@ fun PrizeScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: User
                             )
                     ) {
                         Row(
-                            modifier = Modifier
-                                .padding(vertical = 2.dp),
+                            modifier = Modifier.padding(vertical = 2.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
+                            val buttonId = prize.title
                             var buttonState by remember { mutableStateOf(ButtonState.Default) }
                             var isButtonEnabled by remember { mutableStateOf(userPoints >= prize.cost) }
+                            val isRedeemed = remember {
+                                mutableStateOf(prizeViewModel.isButtonRedeemed(buttonId))
+                            }
 
+                            Log.d("isButtonEnabled_", "${isRedeemed.value}")
+
+
+                            if (isRedeemed.value) {
+                                buttonState = ButtonState.Redeemed
+                                isButtonEnabled = false
+                                Log.d("isButtonEnabled_", "${isRedeemed.value}")
+                            }
                             Text(
-                                text = prize.title,
-                                modifier = Modifier.padding(8.dp)
+                                text = prize.title, modifier = Modifier.padding(8.dp)
                             )
                             Spacer(modifier = Modifier.weight(1f))
                             ElevatedButton(
@@ -129,20 +147,24 @@ fun PrizeScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: User
                                         ButtonState.Default -> {
                                             buttonState = ButtonState.Confirm
                                         }
+
                                         ButtonState.Confirm -> {
                                             // Deduct points from user's currentPoints
-                                            viewModel.user.minusPoints(prize.cost)
+                                            userViewModel.user.minusPoints(prize.cost)
 
                                             // Update button state and disable the button
                                             buttonState = ButtonState.Redeemed
                                             isButtonEnabled = false
+                                            prizeViewModel.setButtonRedeemed(buttonId)
                                         }
+
                                         else -> {
                                             // Handle other button states if needed
+                                            // ...
                                         }
                                     }
                                 },
-                                shape =  RoundedCornerShape(6.dp),
+                                shape = RoundedCornerShape(6.dp),
                                 elevation = ButtonDefaults.elevatedButtonElevation(6.dp),
                                 enabled = isButtonEnabled,
                                 modifier = Modifier.height(55.dp)
@@ -156,9 +178,11 @@ fun PrizeScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: User
                                             )
                                             Text(prize.cost.toString())
                                         }
+
                                         ButtonState.Confirm -> {
                                             Text("Confirm")
                                         }
+
                                         ButtonState.Redeemed -> {
                                             Text("Redeemed")
                                         }
@@ -177,21 +201,17 @@ fun PrizeScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: User
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                PrizeFloatingActionButton(
-                    onClick = { showPrizeBottomSheet = true }
-                )
+                PrizeFloatingActionButton(onClick = { showPrizeBottomSheet = true })
             }
         }
 
         if (showPrizeBottomSheet) {
-            PrizeBottomSheet(
-                showTaskBottomSheet = showPrizeBottomSheet,
+            PrizeBottomSheet(showTaskBottomSheet = showPrizeBottomSheet,
                 onClose = { showPrizeBottomSheet = false },
                 onPrizeSave = { newPrize ->
                     prizes.add(newPrize)
                     showPrizeBottomSheet = false
-                }
-            )
+                })
         }
     }
 }
@@ -199,9 +219,7 @@ fun PrizeScreen(contentPadding: PaddingValues = PaddingValues(), viewModel: User
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrizeBottomSheet(
-    showTaskBottomSheet: Boolean,
-    onClose: () -> Unit,
-    onPrizeSave: (Prize) -> Unit
+    showTaskBottomSheet: Boolean, onClose: () -> Unit, onPrizeSave: (Prize) -> Unit
 ) {
     var isCostMenuExpanded by remember { mutableStateOf(false) }
     val costRangeOptions = listOf("Cheap", "Affordable", "Mid-range", "Premium")
@@ -211,12 +229,10 @@ fun PrizeBottomSheet(
 
     if (showTaskBottomSheet) {
         ModalBottomSheet(
-            onDismissRequest = onClose,
-            sheetState = rememberModalBottomSheetState()
+            onDismissRequest = onClose, sheetState = rememberModalBottomSheetState()
         ) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             ) {
                 Column(
                     modifier = Modifier
@@ -224,11 +240,9 @@ fun PrizeBottomSheet(
                         .fillMaxSize()
                 ) {
                     // User input field
-                    TextField(
-                        value = prizeName,
+                    TextField(value = prizeName,
                         onValueChange = { prizeName = it },
-                        label = { Text("Input new prize here") }
-                    )
+                        label = { Text("Input new prize here") })
 
                     Spacer(modifier = Modifier.height(30.dp))
 
@@ -242,18 +256,13 @@ fun PrizeBottomSheet(
                                 Text(selectedCostRange.ifBlank { "Cost Range" })
                             }
                         }
-                        DropdownMenu(
-                            expanded = isCostMenuExpanded,
-                            onDismissRequest = { isCostMenuExpanded = false }
-                        ) {
+                        DropdownMenu(expanded = isCostMenuExpanded,
+                            onDismissRequest = { isCostMenuExpanded = false }) {
                             costRangeOptions.forEach { option ->
-                                DropdownMenuItem(
-                                    text = { Text(option) },
-                                    onClick = {
-                                        selectedCostRange = option
-                                        isCostMenuExpanded = false
-                                    }
-                                )
+                                DropdownMenuItem(text = { Text(option) }, onClick = {
+                                    selectedCostRange = option
+                                    isCostMenuExpanded = false
+                                })
                             }
                         }
                     }
@@ -261,26 +270,23 @@ fun PrizeBottomSheet(
                     Spacer(modifier = Modifier.height(180.dp))
                     // Icon in lower right corner
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
+                        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clickable {
-                                    val newPrize = Prize(
-                                        title = prizeName,
-                                        prizeCostRange = selectedCostRange,
-                                        isStarred = false,
-                                    )
+                        Box(modifier = Modifier
+                            .size(40.dp)
+                            .clickable {
+                                val newPrize = Prize(
+                                    title = prizeName,
+                                    prizeCostRange = selectedCostRange,
+                                    isStarred = false,
+                                )
 
-                                    val cost = newPrize.calculateCost()
-                                    newPrize.cost = cost
+                                val cost = newPrize.calculateCost()
+                                newPrize.cost = cost
 
-                                    onPrizeSave(newPrize)
-                                    onClose()
-                                }
-                        ) {
+                                onPrizeSave(newPrize)
+                                onClose()
+                            }) {
                             Icon(
                                 imageVector = Icons.Filled.SaveAs,
                                 contentDescription = "Input Button to save new prize",
@@ -301,8 +307,7 @@ fun PrizeFloatingActionButton(
     onClick: () -> Unit
 ) {
     FloatingActionButton(
-        onClick = onClick,
-        modifier = Modifier
+        onClick = onClick, modifier = Modifier
             .size(75.dp)
             .padding(7.dp)
     ) {
@@ -311,7 +316,34 @@ fun PrizeFloatingActionButton(
 }
 
 enum class ButtonState {
-    Default,
-    Confirm,
-    Redeemed
+    Default, Confirm, Redeemed
 }
+
+class PrizeViewModel : ViewModel() {
+    val prizes = mutableStateListOf<Prize>()
+
+    init {
+        startUpPrize()
+    }
+
+    private val redeemedButtonState = mutableMapOf<String, Boolean>()
+
+    fun isButtonRedeemed(buttonId: String): Boolean {
+        return redeemedButtonState[buttonId] ?: false
+    }
+
+    fun setButtonRedeemed(buttonId: String) {
+        redeemedButtonState[buttonId] = true
+    }
+
+    private fun startUpPrize() {
+        val startupPrizes = listOf(
+            Prize("IceScream scoop", "Cheap", 33),
+            Prize("IceScream pint", "Affordable", 58),
+            Prize("Buy Reformation dress", "Premium", 124),
+            Prize("Buy new houseplant", "Mid-range", 86)
+        )
+        prizes.addAll(startupPrizes)
+    }
+}
+
