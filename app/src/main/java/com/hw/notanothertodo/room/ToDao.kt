@@ -9,10 +9,11 @@ import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
+    //data access object for room database
 @Dao
 interface ToDao {
 
-    // user specific
+    // user specific functions
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(user: User)
     @Update
@@ -26,7 +27,7 @@ interface ToDao {
 
 
 
-    //Task Specific
+    //Task Specific functions
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(task: Task)
     @Update
@@ -38,7 +39,7 @@ interface ToDao {
     @Query("SELECT * from tasks ORDER BY title ASC")
     fun getAllTasks(): Flow<List<Task>>
 
-    //prize specific
+    //prize specific functions
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(prize: Prize)
     @Update
@@ -51,7 +52,7 @@ interface ToDao {
     fun getAllPrizes(): Flow<List<Prize>>
 
 
-    //category specific
+    //category specific functions
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(category: Category)
     @Update
@@ -63,7 +64,7 @@ interface ToDao {
     @Query("SELECT * from categories ORDER BY name ASC")
     fun getAllCategories(): Flow<List<Category>>
 
-    //db functions
+    //db one-to-many functions
     @Transaction
     @Query("SELECT * FROM users WHERE name = :name")
     suspend fun getUserTasks(name: String): List<UserWithTasks>
@@ -80,3 +81,4 @@ interface ToDao {
     @Query("SELECT * FROM categories WHERE name = :name")
     suspend fun getCategoryTasks(name: String): List<CategoryWithTasks>
 }
+

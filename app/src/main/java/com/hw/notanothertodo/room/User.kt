@@ -3,6 +3,7 @@ package com.hw.notanothertodo.room
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+//User table structure for room database
 @Entity(tableName = "users")
 data class User(
     @PrimaryKey(autoGenerate = true)

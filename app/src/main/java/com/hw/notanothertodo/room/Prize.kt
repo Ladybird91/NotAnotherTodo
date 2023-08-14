@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import com.hw.notanothertodo.objects.Prize
 import com.hw.notanothertodo.objects.Task
 
-
+//Prize table structure for room database
 @Entity(tableName = "prizes")
 data class Prize(
     @PrimaryKey(autoGenerate = true)
