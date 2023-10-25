@@ -29,7 +29,7 @@ Jason Beutler -> [![](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the
 
 
 Figma Protoype Design:
-https://github.com/Ladybird91/NotAnotherTodo/assets/65924582/60097039-976f-4200-af24-879b9bee618e
+https://github.com/Ladybird91/NotAnotherTodo/assets/65924582/422b845d-84ef-4d19-9e84-4b6beb2d6813
 
 App Demo:
 https://github.com/Ladybird91/NotAnotherTodo/assets/65924582/52834a33-68ec-4061-8ca0-54f81edb0458
